@@ -1,3 +1,7 @@
 binance:
   key: ""
   secret: ""
+log:
+  log_save_path: tmp/logs
+  log_file_name: cash-cow-quantification
+  log_file_ext: .log
