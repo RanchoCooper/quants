@@ -1,12 +1,12 @@
 package binance
 
 import (
-	"context"
-	"encoding/json"
-	"fmt"
+    "context"
+    "encoding/json"
+    "log"
 
-	"go-hexagonal/internal/port.adapter/dependency/http"
-	"go-hexagonal/util/logger"
+    "go-hexagonal/internal/port.adapter/dependency/http"
+    "go-hexagonal/util/logger"
 )
 
 /**
@@ -15,8 +15,9 @@ import (
  */
 
 type TickerPrice struct {
-	Symbol string  `json:"symbol"`
-	Price  float64 `json:"price,string"`
+	Symbol       string  `json:"symbol"`
+	Price        float64 `json:"price,string"`
+	TickerPrices []*TickerPrice
 }
 
 type Ticker24Hour struct {
@@ -43,19 +44,52 @@ type Ticker24Hour struct {
 	Count              int     `json:"count"`
 }
 
-func (tp *TickerPrice) GetTickerPrice(ctx context.Context) {
+type TickerKLine struct {
+	Symbol    string
+	Interval  string // e.g. 1m 3m 5m 15m 30m 1h 2h 4h 6h 8h 12h 1d 3d 1w 1M
+	StartTime int64
+	EndTime   int64
+}
+
+func (tp *TickerPrice) GetTickerPrice(ctx context.Context) *TickerPrice {
+	if tp.Symbol == "" {
+		log.Fatalln("need set symbol first")
+	}
+
 	body := http.GetTickerPrice(tp.Symbol)
 	err := json.Unmarshal(body, tp)
 	if err != nil {
 		logger.Log.Errorf(ctx, "unmarshal fail when GetTickerPrice, err: %v", err)
 	}
+
+	return tp
 }
 
-func (th *Ticker24Hour) GetTicker24Hour(ctx context.Context) {
+func (tp *TickerPrice) GetAllTickerPrice(ctx context.Context) []*TickerPrice {
+	body := http.GetTickerPrice("")
+	err := json.Unmarshal(body, &tp.TickerPrices)
+	if err != nil {
+		logger.Log.Errorf(ctx, "unmarshal fail when GetAllTickerPrice, err: %v", err)
+	}
+
+	return tp.TickerPrices
+}
+
+func (th *Ticker24Hour) GetTicker24Hour(ctx context.Context) *Ticker24Hour {
 	body := http.GetTicker24Hour(th.Symbol)
-	fmt.Println(string(body))
 	err := json.Unmarshal(body, th)
 	if err != nil {
 		logger.Log.Errorf(ctx, "unmarshal fail when GetTicker24Hour, err: %v", err)
 	}
+	return th
+}
+
+func (tkl *TickerKLine) GetTickerKLine(ctx context.Context) *TickerKLine {
+	body := http.GetTickerKLine(tkl.Symbol, tkl.Interval, tkl.StartTime, tkl.EndTime)
+	err := json.Unmarshal(body, &tkl)
+	if err != nil {
+		logger.Log.Errorf(ctx, "unmarshal fail when GetAllTickerPrice, err: %v", err)
+	}
+
+	return tkl
 }

@@ -2,7 +2,6 @@ package binance
 
 import (
     "context"
-    "fmt"
     "testing"
 
     "github.com/stretchr/testify/assert"
@@ -21,11 +20,25 @@ func TestTickerPrice_GetTickerPrice(t *testing.T) {
     assert.NotEmpty(t, tk.Price)
 }
 
+func TestGetAllTickerPrice(t *testing.T) {
+    tp := &TickerPrice{}
+    tp.GetAllTickerPrice(context.Background())
+    assert.NotEmpty(t, tp.TickerPrices)
+}
+
 func TestTickerPrice_GetTicker24Hour(t *testing.T) {
     tk := &Ticker24Hour{
         Symbol: "ETHBTC",
     }
     tk.GetTicker24Hour(context.Background())
-    fmt.Printf("%v", tk)
     assert.NotEmpty(t, tk.PriceChange)
+}
+
+func TestTickerKLine_GetTickerKLine(t *testing.T) {
+    tkl := &TickerKLine{
+        Symbol: "ETHBTC",
+        // FIXME
+        Interval: "1M",
+    }
+    tkl.GetTickerKLine(context.Background())
 }
