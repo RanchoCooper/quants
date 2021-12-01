@@ -10,6 +10,7 @@ import (
     "time"
 
     "go-hexagonal/config"
+    "go-hexagonal/util"
 
     "github.com/gin-gonic/gin"
     "gopkg.in/natefinch/lumberjack.v2"
@@ -62,7 +63,7 @@ type Logger struct {
 }
 
 func init() {
-    fileName := config.Config.Log.LogSavePath + "/" + config.Config.Log.LogFileName + config.Config.Log.LogFileExt
+    fileName := util.GetCurrentPath() + "/../.." + config.Config.Log.LogSavePath + "/" + config.Config.Log.LogFileName + config.Config.Log.LogFileExt
     Log = NewLogger(&lumberjack.Logger{
         Filename:  fileName,
         MaxSize:   500,

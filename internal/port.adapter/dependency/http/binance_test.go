@@ -14,3 +14,8 @@ import (
 func TestPing(t *testing.T) {
     assert.Equal(t, "{}", Ping())
 }
+
+func TestGetTickerPrice(t *testing.T) {
+    result := GetTickerPrice("ETHBTC")
+    assert.NotEmpty(t, result)
+}

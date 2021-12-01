@@ -1,11 +1,13 @@
 package config
 
 import (
-	"io/ioutil"
-	"log"
-	"path/filepath"
-    "runtime"
+    "encoding/json"
+    "fmt"
+    "io/ioutil"
+    "log"
+    "path/filepath"
 
+    "go-hexagonal/util"
     "gopkg.in/yaml.v3"
 )
 
@@ -48,14 +50,15 @@ func readYamlConfig(configPath string) {
 }
 
 func init() {
-    _, file, _, _ := runtime.Caller(0)
-    rootPath := filepath.Dir(file)
+    configPath := util.GetCurrentPath()
 
-	readYamlConfig(rootPath + configFilePath)
+	readYamlConfig(configPath + configFilePath)
 
     // read private sensitive configs
 	if Config.Binance.Key == "" || Config.Binance.Secret == "" {
 		// read private config
-		readYamlConfig(rootPath + privateConfigFilePath)
+		readYamlConfig(configPath + privateConfigFilePath)
 	}
+    bf, _ := json.MarshalIndent(Config, "", "	")
+    fmt.Printf("Config:\n%s\n", string(bf))
 }
