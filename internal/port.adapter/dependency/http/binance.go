@@ -26,12 +26,12 @@ import (
 func Ping() string {
     resp, err := http.Get(fmt.Sprintf("%s/ping", BinanceAPIV3))
     if err != nil {
-        logger.Log.Errorf(context.Background(), "binanceAPIV3 GET /ping err: %v", err)
+        logger.Log.Errorf(context.Background(), "BinanceAPIV3 GET /ping err: %v", err)
     }
     defer resp.Body.Close()
     body, err := ioutil.ReadAll(resp.Body)
     if err != nil {
-        logger.Log.Errorf(context.Background(), "read binanceAPIV3 body err: %v", err)
+        logger.Log.Errorf(context.Background(), "read BinanceAPIV3 body err: %v", err)
     }
 
     return string(body)
@@ -49,13 +49,13 @@ func GetTickerPrice(symbol string) []byte {
 
     resp, err := client.Do(req)
     if err != nil {
-        logger.Log.Errorf(context.Background(), "binanceAPIV3 GET /ticker/price err: %v", err)
+        logger.Log.Errorf(context.Background(), "BinanceAPIV3 GET /ticker/price err: %v", err)
     }
     defer resp.Body.Close()
 
     body, err := ioutil.ReadAll(resp.Body)
     if err != nil {
-        logger.Log.Errorf(context.Background(), "read binanceAPIV3 body err: %v", err)
+        logger.Log.Errorf(context.Background(), "read BinanceAPIV3 body err: %v", err)
     }
 
     return body
@@ -73,13 +73,13 @@ func GetTicker24Hour(symbol string) []byte {
 
     resp, err := client.Do(req)
     if err != nil {
-        logger.Log.Errorf(context.Background(), "binanceAPIV3 GET /ticker/24hr err: %v", err)
+        logger.Log.Errorf(context.Background(), "BinanceAPIV3 GET /ticker/24hr err: %v", err)
     }
     defer resp.Body.Close()
 
     body, err := ioutil.ReadAll(resp.Body)
     if err != nil {
-        logger.Log.Errorf(context.Background(), "read binanceAPIV3 body err: %v", err)
+        logger.Log.Errorf(context.Background(), "read BinanceAPIV3 body err: %v", err)
     }
 
     return body
@@ -101,24 +101,19 @@ func GetTickerKLine(symbol string, interval string, startTime, endTime int64) []
 
     resp, err := client.Do(req)
     if err != nil {
-        logger.Log.Errorf(context.Background(), "binanceAPIV3 GET /klines err: %v", err)
+        logger.Log.Errorf(context.Background(), "BinanceAPIV3 GET /klines err: %v", err)
     }
     defer resp.Body.Close()
 
     body, err := ioutil.ReadAll(resp.Body)
     if err != nil {
-        logger.Log.Errorf(context.Background(), "read binanceAPIV3 body err: %v", err)
+        logger.Log.Errorf(context.Background(), "read BinanceAPIV3 body err: %v", err)
     }
 
     return body
 }
 
 func signature(params *url.Values) *url.Values {
-    // err := copier.Copy(data, params)
-    // if err != nil {
-    //     logger.Log.Errorf(context.Background(), "copier.Copy failed when signature err: %v", err)
-    //     return nil
-    // }
     params.Add("timestamp", cast.ToString(time.Now().Unix()))
     params.Add("recvWindow", cast.ToString(5000))
 
@@ -149,13 +144,13 @@ func TradeLimit(symbol, side string, quantity, price *float64) []byte {
 
     resp, err := client.Do(req)
     if err != nil {
-        logger.Log.Errorf(context.Background(), "binanceAPIV3 POST /order err: %v", err)
+        logger.Log.Errorf(context.Background(), "BinanceAPIV3 POST /order err: %v", err)
     }
     defer resp.Body.Close()
 
     body, err := ioutil.ReadAll(resp.Body)
     if err != nil {
-        logger.Log.Errorf(context.Background(), "read TradeLimit body err: %v", err)
+        logger.Log.Errorf(context.Background(), "read BinanceAPIV3 body err: %v", err)
     }
 
     return body

@@ -1,14 +1,14 @@
 package config
 
 import (
-    "encoding/json"
-    "fmt"
-    "io/ioutil"
-    "log"
-    "path/filepath"
+	"encoding/json"
+	"fmt"
+	"io/ioutil"
+	"log"
+	"path/filepath"
 
-    "cash-cow-quantification/util"
-    "gopkg.in/yaml.v3"
+	"cash-cow-quantification/util"
+	"gopkg.in/yaml.v3"
 )
 
 const (
@@ -21,6 +21,10 @@ type binanceConfig struct {
 	Secret string `yaml:"secret"`
 }
 
+type dingDingConfig struct {
+	AccessToken string `yaml:"access_token"`
+}
+
 type logConfig struct {
 	LogSavePath string `yaml:"log_save_path"`
 	LogFileName string `yaml:"log_file_name"`
@@ -28,8 +32,9 @@ type logConfig struct {
 }
 
 type config struct {
-	Binance *binanceConfig `yaml:"binance"`
-	Log     *logConfig     `yaml:"log"`
+	Binance  *binanceConfig  `yaml:"binance"`
+	DingDing *dingDingConfig `yaml:"dingding"`
+	Log      *logConfig      `yaml:"log"`
 }
 
 var Config = &config{}
@@ -50,15 +55,15 @@ func readYamlConfig(configPath string) {
 }
 
 func init() {
-    configPath := util.GetCurrentPath()
+	configPath := util.GetCurrentPath()
 
 	readYamlConfig(configPath + configFilePath)
 
-    // read private sensitive configs
+	// read private sensitive configs
 	if Config.Binance.Key == "" || Config.Binance.Secret == "" {
 		// read private config
 		readYamlConfig(configPath + privateConfigFilePath)
 	}
-    bf, _ := json.MarshalIndent(Config, "", "	")
-    fmt.Printf("Config:\n%s\n", string(bf))
+	bf, _ := json.MarshalIndent(Config, "", "	")
+	fmt.Printf("Config:\n%s\n", string(bf))
 }

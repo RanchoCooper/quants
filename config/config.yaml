@@ -1,6 +1,8 @@
 binance:
   key: ""
   secret: ""
+dingding:
+  access_token: ""
 log:
   log_save_path: /tmp/logs
   log_file_name: cash-cow-quantification
