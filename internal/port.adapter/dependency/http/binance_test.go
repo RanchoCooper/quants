@@ -1,6 +1,7 @@
 package http
 
 import (
+    "fmt"
     "testing"
 
     "github.com/stretchr/testify/assert"
@@ -36,5 +37,6 @@ func TestTradeLimit(t *testing.T) {
     body := TradeLimit("ETHBTC", "BUY", &quantity, &price)
     // FIXME
     // {"code":-1021,"msg":"Timestamp for this request is outside of the recvWindow."}
+    fmt.Println(string(body))
     assert.NotEmpty(t, body)
 }

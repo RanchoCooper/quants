@@ -4,8 +4,8 @@ import (
     "context"
     "encoding/json"
 
-    "go-hexagonal/internal/port.adapter/dependency/http"
-    "go-hexagonal/util/logger"
+    "cash-cow-quantification/internal/port.adapter/dependency/http"
+    "cash-cow-quantification/util/logger"
 )
 
 /**

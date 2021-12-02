@@ -6,8 +6,8 @@ import (
 	"fmt"
 	"log"
 
-	"go-hexagonal/internal/port.adapter/dependency/http"
-	"go-hexagonal/util/logger"
+    "cash-cow-quantification/internal/port.adapter/dependency/http"
+    "cash-cow-quantification/util/logger"
 
     "github.com/spf13/cast"
 )

@@ -1,7 +1,7 @@
 package binance
 
 import (
-    "go-hexagonal/internal/port.adapter/dependency/http"
+    "cash-cow-quantification/internal/port.adapter/dependency/http"
 )
 
 /**

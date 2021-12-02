@@ -7,7 +7,7 @@ import (
     "log"
     "path/filepath"
 
-    "go-hexagonal/util"
+    "cash-cow-quantification/util"
     "gopkg.in/yaml.v3"
 )
 

@@ -9,8 +9,8 @@ import (
     "runtime"
     "time"
 
-    "go-hexagonal/config"
-    "go-hexagonal/util"
+    "cash-cow-quantification/config"
+    "cash-cow-quantification/util"
 
     "github.com/gin-gonic/gin"
     "gopkg.in/natefinch/lumberjack.v2"

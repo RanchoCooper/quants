@@ -12,8 +12,8 @@ import (
     "strconv"
     "time"
 
-    "go-hexagonal/config"
-    "go-hexagonal/util/logger"
+    "cash-cow-quantification/config"
+    "cash-cow-quantification/util/logger"
 
     "github.com/spf13/cast"
 )
