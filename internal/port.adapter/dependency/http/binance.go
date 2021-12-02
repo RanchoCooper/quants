@@ -2,12 +2,20 @@ package http
 
 import (
     "context"
+    "crypto/hmac"
+    "crypto/sha256"
+    "encoding/hex"
     "fmt"
     "io/ioutil"
     "net/http"
+    "net/url"
     "strconv"
+    "time"
 
+    "go-hexagonal/config"
     "go-hexagonal/util/logger"
+
+    "github.com/spf13/cast"
 )
 
 /**
@@ -100,6 +108,54 @@ func GetTickerKLine(symbol string, interval string, startTime, endTime int64) []
     body, err := ioutil.ReadAll(resp.Body)
     if err != nil {
         logger.Log.Errorf(context.Background(), "read binanceAPIV3 body err: %v", err)
+    }
+
+    return body
+}
+
+func signature(params *url.Values) *url.Values {
+    // err := copier.Copy(data, params)
+    // if err != nil {
+    //     logger.Log.Errorf(context.Background(), "copier.Copy failed when signature err: %v", err)
+    //     return nil
+    // }
+    params.Add("timestamp", cast.ToString(time.Now().Unix()))
+    params.Add("recvWindow", cast.ToString(5000))
+
+    h := hmac.New(sha256.New, []byte(config.Config.Binance.Secret))
+    h.Write([]byte(params.Encode()))
+    sha := hex.EncodeToString(h.Sum(nil))
+    params.Add("signature", sha)
+
+    return params
+}
+
+func TradeLimit(symbol, side string, quantity, price *float64) []byte {
+    client := &http.Client{}
+    req, _ := http.NewRequest(http.MethodPost, fmt.Sprintf("%s/order", BinanceAPIV3), nil)
+
+    req.Header.Set("X-MBX-APIKEY", config.Config.Binance.Key)
+    query := req.URL.Query()
+    query.Add("symbol", symbol)
+    query.Add("side", side)
+    query.Add("quantity", fmt.Sprintf("%.8f", *quantity))
+    if price == nil {
+        query.Add("type", "MARKET")
+    } else {
+        query.Add("type", "LIMIT")
+    }
+    query = *signature(&query)
+    req.URL.RawQuery = query.Encode()
+
+    resp, err := client.Do(req)
+    if err != nil {
+        logger.Log.Errorf(context.Background(), "binanceAPIV3 POST /order err: %v", err)
+    }
+    defer resp.Body.Close()
+
+    body, err := ioutil.ReadAll(resp.Body)
+    if err != nil {
+        logger.Log.Errorf(context.Background(), "read TradeLimit body err: %v", err)
     }
 
     return body

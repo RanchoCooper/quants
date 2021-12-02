@@ -1,12 +1,15 @@
 package binance
 
 import (
-    "context"
-    "encoding/json"
-    "log"
+	"context"
+	"encoding/json"
+	"fmt"
+	"log"
 
-    "go-hexagonal/internal/port.adapter/dependency/http"
-    "go-hexagonal/util/logger"
+	"go-hexagonal/internal/port.adapter/dependency/http"
+	"go-hexagonal/util/logger"
+
+    "github.com/spf13/cast"
 )
 
 /**
@@ -44,11 +47,25 @@ type Ticker24Hour struct {
 	Count              int     `json:"count"`
 }
 
-type TickerKLine struct {
+type TickerKLineQueryVO struct {
 	Symbol    string
 	Interval  string // e.g. 1m 3m 5m 15m 30m 1h 2h 4h 6h 8h 12h 1d 3d 1w 1M
 	StartTime int64
 	EndTime   int64
+}
+
+type TickerKLine struct {
+	OpenTime                 int64
+	Open                     float64
+	High                     float64
+	Low                      float64
+	Close                    float64
+	Volume                   float64
+	CloseTime                int64
+	QuoteAssetVolume         float64
+	NumberOfTrades           int
+	TakerBuyBaseAssetVolume  float64
+	TakerBuyQuoteAssetVolume float64
 }
 
 func (tp *TickerPrice) GetTickerPrice(ctx context.Context) *TickerPrice {
@@ -84,12 +101,35 @@ func (th *Ticker24Hour) GetTicker24Hour(ctx context.Context) *Ticker24Hour {
 	return th
 }
 
-func (tkl *TickerKLine) GetTickerKLine(ctx context.Context) *TickerKLine {
-	body := http.GetTickerKLine(tkl.Symbol, tkl.Interval, tkl.StartTime, tkl.EndTime)
-	err := json.Unmarshal(body, &tkl)
+func (tkl *TickerKLine) UnmarshalJSON(b []byte) error {
+	// We're deserializing into a struct, but in JSON it's a mixed-type array.
+	var arr []interface{}
+	err := json.Unmarshal(b, &arr)
 	if err != nil {
-		logger.Log.Errorf(ctx, "unmarshal fail when GetAllTickerPrice, err: %v", err)
+		return fmt.Errorf("unmarshal Item underlying array: %w", err)
+	}
+	// JSON numbers will become float64 when loaded into interface{} but we want int
+	tkl.OpenTime = cast.ToInt64(arr[0])
+	tkl.Open = cast.ToFloat64(arr[1])
+	tkl.High = cast.ToFloat64(arr[2])
+	tkl.Low = cast.ToFloat64(arr[3])
+	tkl.Close = cast.ToFloat64(arr[4])
+	tkl.Volume = cast.ToFloat64(arr[5])
+	tkl.CloseTime = cast.ToInt64(arr[6])
+	tkl.QuoteAssetVolume = cast.ToFloat64(arr[7])
+	tkl.NumberOfTrades = cast.ToInt(arr[8])
+	tkl.TakerBuyBaseAssetVolume = cast.ToFloat64(arr[9])
+	tkl.TakerBuyQuoteAssetVolume = cast.ToFloat64(arr[10])
+	return nil
+}
+
+func (tkl *TickerKLineQueryVO) GetTickerKLine(ctx context.Context) []*TickerKLine {
+	result := make([]*TickerKLine, 0)
+	body := http.GetTickerKLine(tkl.Symbol, tkl.Interval, tkl.StartTime, tkl.EndTime)
+	err := json.Unmarshal(body, &result)
+	if err != nil {
+		logger.Log.Errorf(ctx, "unmarshal fail when GetTickerKLine, err: %v", err)
 	}
 
-	return tkl
+	return result
 }
