@@ -7,7 +7,7 @@ import (
 	"log"
 	"path/filepath"
 
-	"cash-cow-quantification/util"
+    "quants/util"
 	"gopkg.in/yaml.v3"
 )
 

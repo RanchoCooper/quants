@@ -11,7 +11,9 @@ import (
  */
 
 func TestDingDing_SendDingMessage(t *testing.T) {
-    Dinger.Message = "【构建系统】"
-    Dinger.IsAtAll = false
-    Dinger.SendDingMessage(context.Background())
+    d := DingDing{
+        Message : "【构建系统】",
+        IsAtAll : false,
+    }
+    d.SendDingMessage(context.Background())
 }

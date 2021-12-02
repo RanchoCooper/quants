@@ -1,4 +1,4 @@
-module cash-cow-quantification
+module quants
 
 go 1.17
 

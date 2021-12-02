@@ -1,7 +1,7 @@
 package binance
 
 import (
-    "cash-cow-quantification/internal/port.adapter/dependency/http"
+    "quants/internal/port.adapter/dependency/http"
 )
 
 /**

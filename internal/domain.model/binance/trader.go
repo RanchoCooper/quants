@@ -4,8 +4,8 @@ import (
     "context"
     "encoding/json"
 
-    "cash-cow-quantification/internal/port.adapter/dependency/http"
-    "cash-cow-quantification/util/logger"
+    "quants/internal/port.adapter/dependency/http"
+    "quants/util/logger"
 )
 
 /**

@@ -9,8 +9,8 @@ import (
     "runtime"
     "time"
 
-    "cash-cow-quantification/config"
-    "cash-cow-quantification/util"
+    "quants/config"
+    "quants/util"
 
     "github.com/gin-gonic/gin"
     "gopkg.in/natefinch/lumberjack.v2"

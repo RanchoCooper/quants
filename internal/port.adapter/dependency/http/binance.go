@@ -12,8 +12,8 @@ import (
     "strconv"
     "time"
 
-    "cash-cow-quantification/config"
-    "cash-cow-quantification/util/logger"
+    "quants/config"
+    "quants/util/logger"
 
     "github.com/spf13/cast"
 )

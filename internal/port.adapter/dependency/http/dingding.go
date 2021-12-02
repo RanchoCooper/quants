@@ -8,8 +8,8 @@ import (
 	"io/ioutil"
 	"net/http"
 
-	"cash-cow-quantification/config"
-	"cash-cow-quantification/util/logger"
+    "quants/config"
+    "quants/util/logger"
 )
 
 /**
