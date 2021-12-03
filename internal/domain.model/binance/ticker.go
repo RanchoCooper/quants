@@ -73,7 +73,7 @@ func (tp *TickerPrice) GetTickerPrice(ctx context.Context) *TickerPrice {
 		log.Fatalln("need set symbol first")
 	}
 
-	body := http.GetTickerPrice(tp.Symbol)
+	body := http.BinanceClient.GetTickerPrice(tp.Symbol)
 	err := json.Unmarshal(body, tp)
 	if err != nil {
 		logger.Log.Errorf(ctx, "unmarshal fail when GetTickerPrice, err: %v", err)
@@ -83,7 +83,7 @@ func (tp *TickerPrice) GetTickerPrice(ctx context.Context) *TickerPrice {
 }
 
 func (tp *TickerPrice) GetAllTickerPrice(ctx context.Context) []*TickerPrice {
-	body := http.GetTickerPrice("")
+	body := http.BinanceClient.GetTickerPrice("")
 	err := json.Unmarshal(body, &tp.TickerPrices)
 	if err != nil {
 		logger.Log.Errorf(ctx, "unmarshal fail when GetAllTickerPrice, err: %v", err)
@@ -93,7 +93,7 @@ func (tp *TickerPrice) GetAllTickerPrice(ctx context.Context) []*TickerPrice {
 }
 
 func (th *Ticker24Hour) GetTicker24Hour(ctx context.Context) *Ticker24Hour {
-	body := http.GetTicker24Hour(th.Symbol)
+	body := http.BinanceClient.GetTicker24Hour(th.Symbol)
 	err := json.Unmarshal(body, th)
 	if err != nil {
 		logger.Log.Errorf(ctx, "unmarshal fail when GetTicker24Hour, err: %v", err)
@@ -125,7 +125,7 @@ func (tkl *TickerKLine) UnmarshalJSON(b []byte) error {
 
 func (tkl *TickerKLineQueryVO) GetTickerKLine(ctx context.Context) []*TickerKLine {
 	result := make([]*TickerKLine, 0)
-	body := http.GetTickerKLine(tkl.Symbol, tkl.Interval, tkl.StartTime, tkl.EndTime)
+	body := http.BinanceClient.GetTickerKLine(tkl.Symbol, tkl.Interval, tkl.StartTime, tkl.EndTime)
 	err := json.Unmarshal(body, &result)
 	if err != nil {
 		logger.Log.Errorf(ctx, "unmarshal fail when GetTickerKLine, err: %v", err)

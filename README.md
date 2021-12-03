@@ -1,6 +1,5 @@
 # Quants
 
-
 Quants is a quant-trade system based on hexagonal architecture.
 
 # Reference

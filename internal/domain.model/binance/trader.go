@@ -64,7 +64,7 @@ func (u *Trader) Trade(ctx context.Context, vo *TradeInfoVO) (*TradeResp, bool) 
         return nil, false
     }
 
-    body := http.TradeLimit(vo.Symbol, vo.Side, &vo.Quantity, &vo.Price)
+    body := http.BinanceClient.TradeLimit(vo.Symbol, vo.Side, &vo.Quantity, &vo.Price)
     resp := &TradeResp{}
     err := json.Unmarshal(body, resp)
     if err != nil {

@@ -17,5 +17,5 @@ type DingDing struct {
 }
 
 func (d *DingDing) SendDingMessage(ctx context.Context) bool {
-	return http.SendDingDingMessage(d.Message, d.IsAtAll)
+	return http.DingDingClient.SendDingDingMessage(d.Message, d.IsAtAll)
 }

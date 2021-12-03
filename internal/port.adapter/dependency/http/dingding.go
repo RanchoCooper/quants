@@ -17,6 +17,18 @@ import (
  * @date 2021/12/3
  */
 
+type IDingDingAPI interface {
+    SendDingDingMessage(string, bool) bool
+}
+
+type dingDingClient struct {
+
+}
+
+var (
+    DingDingClient IDingDingAPI = &dingDingClient{}
+)
+
 type DingDingMessage struct {
 	Msgtype string `json:"msgtype"`
 	At      struct {
@@ -39,7 +51,7 @@ func (d DingDingResponse) String() string {
 	return fmt.Sprintf("{errcode: %d, errmsg: %s}", d.Errcode, d.Errmsg)
 }
 
-func (d *DingDingMessage) Marshal() []byte {
+func (d *DingDingMessage) marshal() []byte {
 	d.Msgtype = "text"
 	d.At = struct {
 		AtMobiles []string    `json:"atMobiles"`
@@ -56,22 +68,23 @@ func (d *DingDingMessage) Marshal() []byte {
 
 	b, err := json.Marshal(d)
 	if err != nil {
-		logger.Log.Errorf(context.Background(), "json.Marshal fail when DingDingMessage.Marshal, msg: %s, err: %v", d.Message, err)
+		logger.Log.Errorf(context.Background(), "json.Marshal fail when DingDingMessage.marshal, msg: %s, err: %v", d.Message, err)
 	}
 
 	return b
 }
 
-func SendDingDingMessage(msg string, isAtAll bool) bool {
+func (d *dingDingClient)SendDingDingMessage(msg string, isAtAll bool) bool {
 	client := &http.Client{}
 
-	d := DingDingMessage{
+	dm := DingDingMessage{
+        Message: msg,
 		Msgtype: "text",
         IsAtAll: isAtAll,
 	}
-	body := d.Marshal()
+	body := dm.marshal()
 
-	req, _ := http.NewRequest(http.MethodPost, fmt.Sprintf("%s/robot/send", DingDingAPI), bytes.NewReader(body))
+	req, _ := http.NewRequest(http.MethodPost, fmt.Sprintf("%s/robot/send", DingDingAPIUrl), bytes.NewReader(body))
 	req.Header.Set("Content-Type", "application/json;charset=utf-8")
 	query := req.URL.Query()
 	query.Add("access_token", config.Config.DingDing.AccessToken)
@@ -79,18 +92,18 @@ func SendDingDingMessage(msg string, isAtAll bool) bool {
 
 	resp, err := client.Do(req)
 	if err != nil {
-		logger.Log.Errorf(context.Background(), "DingDingAPI POST /robot/send err: %v", err)
+		logger.Log.Errorf(context.Background(), "DingDingClient POST /robot/send err: %v", err)
 	}
 	defer resp.Body.Close()
 
 	respBody, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		logger.Log.Errorf(context.Background(), "read DingDingAPI body err: %v", err)
+		logger.Log.Errorf(context.Background(), "read DingDingClient body err: %v", err)
 	}
 	dingResp := DingDingResponse{}
 	err = json.Unmarshal(respBody, &dingResp)
 	if err != nil {
-		logger.Log.Errorf(context.Background(), "json.Unmarshal DingDingAPI body err: %v", err)
+		logger.Log.Errorf(context.Background(), "json.Unmarshal DingDingClient body err: %v", err)
 	}
 	if dingResp.Errcode != 0 {
 		logger.Log.Errorf(context.Background(), "SendDingDingMessage fail. msg: %v, dingResp: %v", msg, dingResp)

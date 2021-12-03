@@ -10,5 +10,5 @@ import (
  */
 
 func TestSendDingDingMessage(t *testing.T) {
-    // SendDingDingMessage("testing message")
+    // DingDingClient.SendDingDingMessage("testing message", false)
 }

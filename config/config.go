@@ -8,6 +8,7 @@ import (
 	"path/filepath"
 
     "quants/util"
+
 	"gopkg.in/yaml.v3"
 )
 
@@ -64,6 +65,6 @@ func init() {
 		// read private config
 		readYamlConfig(configPath + privateConfigFilePath)
 	}
-	bf, _ := json.MarshalIndent(Config, "", "	")
+	bf, _ := json.MarshalIndent(Config, "", "    ")
 	fmt.Printf("Config:\n%s\n", string(bf))
 }

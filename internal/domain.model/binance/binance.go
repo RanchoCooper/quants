@@ -14,5 +14,5 @@ type Binance struct {
 }
 
 func (b Binance) Ping() string {
-    return http.Ping()
+    return http.BinanceClient.Ping()
 }
