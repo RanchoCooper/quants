@@ -14,7 +14,6 @@ import (
  */
 
 type Trader struct {
-
 }
 
 type TradeInfoVO struct {
@@ -44,6 +43,12 @@ type TradeResp struct {
         Commission      string `json:"commission"`
         CommissionAsset string `json:"commissionAsset"`
     } `json:"fills"`
+    Msg string `json:"msg"`
+}
+
+func (tr *TradeResp) String() string {
+    b, _ := json.MarshalIndent(tr, "", "    ")
+    return string(b)
 }
 
 func (u *Trader) Trade(ctx context.Context, vo *TradeInfoVO) (*TradeResp, bool) {

@@ -2,6 +2,7 @@ package binance
 
 import (
     "context"
+    "fmt"
     "testing"
 
     "github.com/stretchr/testify/assert"
@@ -22,6 +23,6 @@ func TestTrader_Trade(t *testing.T) {
     trader := &Trader{}
     resp, _ := trader.Trade(context.Background(), vo)
     // FIXME
-    assert.Empty(t, resp)
-    // assert.NotEmpty(t, resp)
+    fmt.Printf("%+v", resp)
+    assert.NotEmpty(t, resp)
 }
