@@ -33,7 +33,7 @@ type BetData struct {
         Step          int     `json:"step"`            // 当前仓位
     } `json:"run_bet"`
     Config struct {
-        ProfitRatio      int       `json:"profit_ratio"`       //  止盈比率
+        ProfitRatio      int       `json:"profit_ratio"`       // 止盈比率
         DoubleThrowRatio int       `json:"double_throw_ratio"` // 补仓比率
         Cointype         string    `json:"cointype"`           // 交易币种
         Quantity         []float64 `json:"quantity"`           // 交易数量
