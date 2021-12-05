@@ -35,11 +35,12 @@ func TestTickerPrice_GetTicker24Hour(t *testing.T) {
 }
 
 func TestTickerKLine_GetTickerKLine(t *testing.T) {
-    tkl := &TickerKLineQueryVO{
-        Symbol: "ETHBTC",
+    vo := &TickerKLineQueryVO{
+        Symbol:   "ETHBTC",
         Interval: "1M",
     }
-    r := tkl.GetTickerKLine(context.Background())
+    tkl := TickerKLine{}
+    r := tkl.GetTickerKLine(context.Background(), vo)
     assert.NotEmpty(t, len(r))
     assert.NotEmpty(t, r[0])
 }
