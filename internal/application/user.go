@@ -13,19 +13,21 @@ import (
  * @date 2021/12/5
  */
 
-func AddUser(ctx context.Context) {
+func AddUser(ctx context.Context, userName, userEmail string) bool {
     mySQLRepository, err := repository.NewMySQLRepository()
     if err != nil {
         logger.Log.Errorf(ctx, "init MySQLRepository fail, err: %v", err)
-        return
+        return false
     }
 
     _, err = mySQLRepository.User.SaveUser(ctx, &user.User{
-        UserName:  "rancho-test",
-        UserEmail: "rancho941110@gmail.com",
+        UserName:  userName,
+        UserEmail: userEmail,
     })
     if err != nil {
         logger.Log.Errorf(ctx, "AddUser fail when SaveUser, err: %v", err)
-        return
+        return false
     }
+
+    return true
 }

@@ -3,6 +3,10 @@ package application
 import (
     "context"
     "testing"
+
+    "github.com/stretchr/testify/assert"
+
+    "quants/util"
 )
 
 /**
@@ -11,5 +15,8 @@ import (
  */
 
 func TestAddUser(t *testing.T) {
-    AddUser(context.Background())
+    assert.True(t, AddUser(context.Background(),
+        "rancho-test-"+util.RandString(10, false),
+        util.RandString(10, false)+"@gmail.com",
+    ))
 }
