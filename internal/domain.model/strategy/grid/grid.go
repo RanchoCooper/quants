@@ -1,4 +1,4 @@
-package bet
+package grid
 
 import (
     "context"
@@ -15,10 +15,8 @@ import (
 
 /**
  * @author Rancho
- * @date 2021/12/3
+ * @date 2021/12/5
  */
-
-const betDataJSONFile = "bet.json"
 
 type exchangeType int8
 
@@ -27,8 +25,9 @@ const (
     Sell exchangeType = 1
 )
 
-type BetData struct {
-    RunBet struct {
+type Grid struct {
+    ConfigJSONFile string `json:"-"`
+    RunBet         struct {
         NextBuyPrice  float64 `json:"next_buy_price"`  // 下次开仓价
         GridSellPrice float64 `json:"grid_sell_price"` // 当前止盈价
         Step          int     `json:"step"`            // 当前仓位
@@ -41,14 +40,14 @@ type BetData struct {
     } `json:"config"`
 }
 
-func (b BetData) String() string {
+func (b Grid) String() string {
     bf, _ := json.MarshalIndent(b, "", "    ")
     return string(bf)
 }
 
-func (b *BetData) LoadFromJSON(ctx context.Context) {
+func (b *Grid) LoadFromJSON(ctx context.Context) {
     basePath := util.GetCurrentPath()
-    content := file.ReadFile(basePath + "/" + betDataJSONFile)
+    content := file.ReadFile(basePath + "/" + b.ConfigJSONFile)
     if content == nil {
         return
     }
@@ -58,13 +57,13 @@ func (b *BetData) LoadFromJSON(ctx context.Context) {
     }
 }
 
-func (b *BetData) WriteToJSON(ctx context.Context) bool {
-    filePath := util.GetCurrentPath() + "/" + betDataJSONFile
+func (b *Grid) WriteToJSON(ctx context.Context) bool {
+    filePath := util.GetCurrentPath() + "/" + b.ConfigJSONFile
     if _, err := os.Stat(filePath); err != nil {
         if os.IsNotExist(err) {
             _, err2 := os.Create(filePath)
             if err2 != nil {
-                logger.Log.Errorf(ctx, "WriteToJSON fail when Create file, err: %v", err)
+                logger.Log.Errorf(ctx, "WriteToJSON fail when Create f, err: %v", err)
                 return false
             }
             return true
@@ -73,12 +72,12 @@ func (b *BetData) WriteToJSON(ctx context.Context) bool {
             return false
         }
     }
-    file, err := os.OpenFile(filePath, os.O_WRONLY, 0666)
+    f, err := os.OpenFile(filePath, os.O_WRONLY, 0666)
     if err != nil {
         logger.Log.Errorf(ctx, "WriteToJSON fail when os.OpenFile, err: %v", err)
         return false
     }
-    defer file.Close()
+    defer f.Close()
 
     content, err := json.MarshalIndent(b, "", "    ")
     if err != nil {
@@ -86,7 +85,7 @@ func (b *BetData) WriteToJSON(ctx context.Context) bool {
         return false
     }
 
-    _, err = io.WriteString(file, string(content))
+    _, err = io.WriteString(f, string(content))
     if err != nil {
         logger.Log.Errorf(ctx, "WriteToJSON fail when io.WriteString, err: %v", err)
         return false
@@ -95,7 +94,7 @@ func (b *BetData) WriteToJSON(ctx context.Context) bool {
     return true
 }
 
-func (b *BetData) GetQuantity(ctx context.Context, action exchangeType) float64 {
+func (b *Grid) GetQuantity(action exchangeType) float64 {
     var curStep int
     if action == Buy {
         curStep = b.RunBet.Step
@@ -118,7 +117,7 @@ func (b *BetData) GetQuantity(ctx context.Context, action exchangeType) float64 
     return quantity
 }
 
-func (b *BetData) ModifyPrice(ctx context.Context, dealPrice float64, step int) bool {
+func (b *Grid) ModifyPrice(ctx context.Context, dealPrice float64, step int) bool {
     b.RunBet.NextBuyPrice = dealPrice * cast.ToFloat64(1-b.Config.DoubleThrowRatio/100)
     b.RunBet.GridSellPrice = dealPrice * cast.ToFloat64(1+b.Config.ProfitRatio/100)
     b.RunBet.Step = step
@@ -127,18 +126,18 @@ func (b *BetData) ModifyPrice(ctx context.Context, dealPrice float64, step int) 
     return b.WriteToJSON(ctx)
 }
 
-func (b *BetData) GetBuyPrice() float64 {
+func (b *Grid) GetBuyPrice() float64 {
     return b.RunBet.NextBuyPrice
 }
 
-func (b *BetData) GetSellPrice() float64 {
+func (b *Grid) GetSellPrice() float64 {
     return b.RunBet.GridSellPrice
 }
 
-func (b *BetData) GetCoinType() string {
+func (b *Grid) GetCoinType() string {
     return b.Config.Cointype
 }
 
-func (b *BetData) GetStep() int {
+func (b *Grid) GetStep() int {
     return b.RunBet.Step
 }
