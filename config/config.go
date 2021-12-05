@@ -17,6 +17,13 @@ const (
     privateConfigFilePath = "/config.private.yaml"
 )
 
+type EnvType string
+
+const (
+    EnvTesting EnvType = "testing"
+    EnvLocal   EnvType = "local"
+)
+
 type binanceConfig struct {
     Key    string `yaml:"key"`
     Secret string `yaml:"secret"`
@@ -48,6 +55,7 @@ type mysqlConfig struct {
 }
 
 type config struct {
+    Env      string          `yaml:"env"`
     Log      *logConfig      `yaml:"log"`
     Binance  *binanceConfig  `yaml:"binance"`
     DingDing *dingDingConfig `yaml:"dingding"`

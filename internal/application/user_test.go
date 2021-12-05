@@ -6,6 +6,7 @@ import (
 
     "github.com/stretchr/testify/assert"
 
+    "quants/config"
     "quants/util"
 )
 
@@ -15,6 +16,9 @@ import (
  */
 
 func TestAddUser(t *testing.T) {
+    if config.Config.Env == string(config.EnvTesting) {
+        return
+    }
     assert.True(t, AddUser(context.Background(),
         "rancho-test-"+util.RandString(10, false),
         util.RandString(10, false)+"@gmail.com",
@@ -22,5 +26,9 @@ func TestAddUser(t *testing.T) {
 }
 
 func TestGetUsers(t *testing.T) {
-    assert.NotEmpty(t, GetUsers(context.Background()))
+    if config.Config.Env == string(config.EnvTesting) {
+        assert.Empty(t, GetUsers(context.Background()))
+    } else {
+        assert.NotEmpty(t, GetUsers(context.Background()))
+    }
 }
