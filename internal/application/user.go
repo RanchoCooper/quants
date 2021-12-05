@@ -31,3 +31,19 @@ func AddUser(ctx context.Context, userName, userEmail string) bool {
 
     return true
 }
+
+func GetUsers(ctx context.Context) []*user.User {
+    mySQLRepository, err := repository.NewMySQLRepository()
+    if err != nil {
+        logger.Log.Errorf(ctx, "init MySQLRepository fail, err: %v", err)
+        return nil
+    }
+
+    users, err := mySQLRepository.User.GetUsers(ctx)
+    if err != nil {
+        logger.Log.Errorf(ctx, "GetUsers fail, err: %v", err)
+        return nil
+    }
+
+    return users
+}

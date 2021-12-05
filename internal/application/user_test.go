@@ -20,3 +20,7 @@ func TestAddUser(t *testing.T) {
         util.RandString(10, false)+"@gmail.com",
     ))
 }
+
+func TestGetUsers(t *testing.T) {
+    assert.NotEmpty(t, GetUsers(context.Background()))
+}
