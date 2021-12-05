@@ -1,3 +1,4 @@
+env: "testing"
 binance:
   key: ""
   secret: ""
@@ -5,5 +6,18 @@ dingding:
   access_token: ""
 log:
   log_save_path: /tmp/logs
-  log_file_name: cash-cow-quantification
+  log_file_name: quant
   log_file_ext: .log
+mysql:
+  user: "root"
+  password: ""
+  host: "localhost"
+  port: 3306
+  database: "quant"
+  max_idle_conns: 50
+  max_open_conns: 100
+  max_life_time: "36000s"
+  max_idle_time: "3600s"
+  char_set: "utf8mb4"
+  parse_time: true
+  time_zone: "Asia%2fShanghai"
