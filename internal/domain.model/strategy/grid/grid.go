@@ -8,7 +8,6 @@ import (
 
     "github.com/spf13/cast"
 
-    "quants/util"
     "quants/util/file"
     "quants/util/logger"
 )
@@ -46,8 +45,7 @@ func (b Grid) String() string {
 }
 
 func (b *Grid) LoadFromJSON(ctx context.Context) {
-    basePath := util.GetCurrentPath()
-    content := file.ReadFile(basePath + "/" + b.ConfigJSONFile)
+    content := file.ReadFile(b.ConfigJSONFile)
     if content == nil {
         return
     }
@@ -58,7 +56,7 @@ func (b *Grid) LoadFromJSON(ctx context.Context) {
 }
 
 func (b *Grid) WriteToJSON(ctx context.Context) bool {
-    filePath := util.GetCurrentPath() + "/" + b.ConfigJSONFile
+    filePath := b.ConfigJSONFile
     if _, err := os.Stat(filePath); err != nil {
         if os.IsNotExist(err) {
             _, err2 := os.Create(filePath)

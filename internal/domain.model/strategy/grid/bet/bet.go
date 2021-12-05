@@ -2,6 +2,7 @@ package bet
 
 import (
     "quants/internal/domain.model/strategy/grid"
+    "quants/util"
 )
 
 /**
@@ -18,7 +19,7 @@ type GridBet struct {
 func NewGridBet() *GridBet {
     return &GridBet{
         Grid: grid.Grid{
-            ConfigJSONFile: gridBetJSONFile,
+            ConfigJSONFile: util.GetCurrentPath() + "/" + gridBetJSONFile,
         },
     }
 }
