@@ -23,9 +23,6 @@ type UserRepo struct {
     db *gorm.DB
 }
 
-// UserRepo implements the repository.IUser interface
-var _ IUser = &UserRepo{}
-
 func NewUserRepository(db *gorm.DB) *UserRepo {
     return &UserRepo{db: db}
 }
@@ -52,3 +49,6 @@ func (u *UserRepo) SaveUser(ctx context.Context, user *user.User) (*user.User, e
 
     return user, nil
 }
+
+// UserRepo implements the IUser interface
+var _ IUser = &UserRepo{}
