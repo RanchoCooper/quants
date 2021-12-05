@@ -17,11 +17,11 @@ import (
  * @date 2021/12/5
  */
 
-type exchangeType int8
+type ExchangeType int8
 
 const (
-    Buy  exchangeType = 0
-    Sell exchangeType = 1
+    Buy  ExchangeType = 0
+    Sell ExchangeType = 1
 )
 
 type Grid struct {
@@ -88,7 +88,7 @@ func (b *Grid) WriteToJSON(ctx context.Context) bool {
     return true
 }
 
-func (b *Grid) GetQuantity(action exchangeType) float64 {
+func (b *Grid) GetQuantity(action ExchangeType) float64 {
     var curStep int
     if action == Buy {
         curStep = b.Step

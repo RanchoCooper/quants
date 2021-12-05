@@ -1,0 +1,21 @@
+{
+    "spot_buy_price": 4.594,
+    "spot_sell_price": 4.806,
+    "spot_step": 0,
+    "record_spot_price": [],
+    "future_buy_price": 4.806,
+    "future_sell_price": 4.594,
+    "future_step": 0,
+    "record_future_price": [],
+    "profit_ratio": 2.25,
+    "double_throw_ratio": 2.25,
+    "cointype": "EOSUSDT",
+    "floor_price": 1,
+    "ceil_price": 10,
+    "spot_quantity": [
+        5
+    ],
+    "future_quantity": [
+        5
+    ]
+}

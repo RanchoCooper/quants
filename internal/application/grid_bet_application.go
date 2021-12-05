@@ -19,15 +19,16 @@ import (
 
 func GridBetRun(ctx context.Context) {
     gridBet := bet.NewGridBet()
-    gridBet.Grid.LoadFromJSON(ctx)
-    tp := &binance.TickerPrice{
-        Symbol: gridBet.Grid.GetCoinType(),
+    gridBet.Grid.LoadFromJSON(context.Background())
+    b := &binance.Binance{
+        TickerPrice: binance.TickerPrice{
+            Symbol: gridBet.Grid.GetCoinType(),
+        },
     }
-    trader := &binance.Trader{}
     ding := &dingding.DingDing{}
 
     for {
-        curMarketPrice := tp.GetTickerPrice(ctx).Price      // 当前交易市价
+        curMarketPrice := b.GetTickerPrice(ctx).Price       // 当前交易市价
         gridBuyPrice := gridBet.Grid.GetBuyPrice()          // 当前网格买入价格
         gridSellPrice := gridBet.Grid.GetSellPrice()        // 当前网格卖出价格
         buyQuantity := gridBet.Grid.GetQuantity(grid.Buy)   // 买单量
@@ -36,7 +37,7 @@ func GridBetRun(ctx context.Context) {
 
         // 满足买入价
         if gridBuyPrice >= curMarketPrice {
-            tradeResp, ok := trader.Trade(ctx, &binance.TradeInfoVO{
+            tradeResp, ok := b.Trade(ctx, &binance.TradeInfoVO{
                 Symbol:   gridBet.Grid.GetCoinType(),
                 Side:     "BUY",
                 Quantity: buyQuantity,
@@ -62,7 +63,7 @@ func GridBetRun(ctx context.Context) {
             if step == 0 {
                 gridBet.Grid.ModifyPrice(ctx, gridSellPrice, step)
             } else {
-                tradeResp, ok := trader.Trade(ctx, &binance.TradeInfoVO{
+                tradeResp, ok := b.Trade(ctx, &binance.TradeInfoVO{
                     Symbol:   gridBet.Grid.GetCoinType(),
                     Side:     "SELL",
                     Quantity: sellQuantity,
@@ -82,7 +83,8 @@ func GridBetRun(ctx context.Context) {
                 }
             }
         }
+        logger.Log.Infof(ctx, "当前市价: %f。未能满足交易，一分钟后继续运行", curMarketPrice)
 
-        logger.Log.Infof(ctx, "当前市价: %f。未能满足交易，继续运行", curMarketPrice)
+        time.Sleep(1 * time.Minute)
     }
 }
