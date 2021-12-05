@@ -32,10 +32,26 @@ type logConfig struct {
     LogFileExt  string `yaml:"log_file_ext"`
 }
 
+type mysqlConfig struct {
+    User         string `yaml:"user"`
+    Password     string `yaml:"password"`
+    Host         string `yaml:"host"`
+    Port         int    `yaml:"port"`
+    Database     string `yaml:"database"`
+    MaxIdleConns int    `yaml:"max_idle_conns"`
+    MaxOpenConns int    `yaml:"max_open_conns"`
+    MaxLifeTime  string `yaml:"max_life_time"`
+    MaxIdleTime  string `yaml:"max_idle_time"`
+    CharSet      string `yaml:"char_set"`
+    ParseTime    bool   `yaml:"parse_time"`
+    TimeZone     string `yaml:"time_zone"`
+}
+
 type config struct {
+    Log      *logConfig      `yaml:"log"`
     Binance  *binanceConfig  `yaml:"binance"`
     DingDing *dingDingConfig `yaml:"dingding"`
-    Log      *logConfig      `yaml:"log"`
+    MySQL    *mysqlConfig    `yaml:"mysql"`
 }
 
 var Config = &config{}
