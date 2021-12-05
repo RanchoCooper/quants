@@ -14,13 +14,7 @@ import (
  */
 
 func AddUser(ctx context.Context, userName, userEmail string) bool {
-    mySQLRepository, err := repository.NewMySQLRepository()
-    if err != nil {
-        logger.Log.Errorf(ctx, "init MySQLRepository fail, err: %v", err)
-        return false
-    }
-
-    _, err = mySQLRepository.User.SaveUser(ctx, &user.User{
+    _, err := repository.MySQL.User.SaveUser(ctx, &user.User{
         UserName:  userName,
         UserEmail: userEmail,
     })
@@ -33,13 +27,7 @@ func AddUser(ctx context.Context, userName, userEmail string) bool {
 }
 
 func GetUsers(ctx context.Context) []*user.User {
-    mySQLRepository, err := repository.NewMySQLRepository()
-    if err != nil {
-        logger.Log.Errorf(ctx, "init MySQLRepository fail, err: %v", err)
-        return nil
-    }
-
-    users, err := mySQLRepository.User.GetUsers(ctx)
+    users, err := repository.MySQL.User.GetUsers(ctx)
     if err != nil {
         logger.Log.Errorf(ctx, "GetUsers fail, err: %v", err)
         return nil

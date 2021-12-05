@@ -16,9 +16,21 @@ import (
  * @date 2021/12/5
  */
 
+var MySQL *MySQLRepository
+
 type MySQLRepository struct {
     User *mysql.UserRepo
     db   *gorm.DB
+}
+
+func init() {
+    if MySQL == nil {
+        MySQL, err := NewMySQLRepository()
+        if err != nil {
+            panic("init MySQL fail, err: " + err.Error())
+        }
+        _ = MySQL
+    }
 }
 
 func NewMySQLRepository() (*MySQLRepository, error) {
@@ -47,8 +59,10 @@ func NewMySQLRepository() (*MySQLRepository, error) {
     sqlDB.SetMaxIdleConns(config.Config.MySQL.MaxIdleConns)
     sqlDB.SetMaxOpenConns(config.Config.MySQL.MaxOpenConns)
 
-    return &MySQLRepository{
+    MySQL = &MySQLRepository{
         User: mysql.NewUserRepository(db),
         db:   db,
-    }, nil
+    }
+
+    return MySQL, nil
 }
