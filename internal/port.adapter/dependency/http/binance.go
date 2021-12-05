@@ -12,10 +12,10 @@ import (
     "strconv"
     "time"
 
+    "github.com/spf13/cast"
+
     "quants/config"
     "quants/util/logger"
-
-    "github.com/spf13/cast"
 )
 
 /**
@@ -32,7 +32,6 @@ type IBinanceAPI interface {
 }
 
 type binanceAPI struct {
-
 }
 
 var BinanceClient IBinanceAPI = &binanceAPI{}

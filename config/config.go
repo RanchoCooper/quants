@@ -7,9 +7,9 @@ import (
     "log"
     "path/filepath"
 
-    "quants/util"
-
     "gopkg.in/yaml.v3"
+
+    "quants/util"
 )
 
 const (

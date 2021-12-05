@@ -6,10 +6,10 @@ import (
     "fmt"
     "log"
 
+    "github.com/spf13/cast"
+
     "quants/internal/port.adapter/dependency/http"
     "quants/util/logger"
-
-    "github.com/spf13/cast"
 )
 
 /**
