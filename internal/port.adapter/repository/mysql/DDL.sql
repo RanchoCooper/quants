@@ -22,6 +22,7 @@ CREATE TABLE IF NOT EXISTS `quant_trade` (
     `type` TINYINT(3) UNSIGNED DEFAULT '0' COMMENT 'state 0: default, 1: buy, 2: sell',
     `price` DECIMAL NOT NULL DEFAULT '0.0' COMMENT 'price',
     `quantity` DECIMAL NOT NULL DEFAULT '0.0' COMMENT 'quantity',
+    `is_simulate` BOOLEAN NOT NULL DEFAULT FALSE COMMENT 'is simulate',
     `created_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'created at',
     `updated_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'updated at',
     `deleted_at` DATETIME COMMENT 'deleted at',

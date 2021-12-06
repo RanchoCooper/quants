@@ -20,8 +20,9 @@ import (
 var MySQL *MySQLRepository
 
 type MySQLRepository struct {
-    User *mysql.UserRepo
-    db   *gorm.DB
+    User  *mysql.UserRepo
+    Trade *mysql.TradeRepo
+    db    *gorm.DB
 }
 
 func init() {
@@ -69,8 +70,9 @@ func NewMySQLRepository() (*MySQLRepository, error) {
     if config.Config.Env == string(config.EnvTesting) {
         db := mockMySQL()
         MySQL = &MySQLRepository{
-            User: mysql.NewUserRepository(db),
-            db:   db,
+            User:  mysql.NewUserRepository(db),
+            Trade: mysql.NewTradeRepository(db),
+            db:    db,
         }
 
         return MySQL, nil

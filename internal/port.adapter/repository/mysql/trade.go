@@ -25,6 +25,10 @@ type TradeRepo struct {
     db *gorm.DB
 }
 
+func NewTradeRepository(db *gorm.DB) *TradeRepo {
+    return &TradeRepo{db: db}
+}
+
 func (t TradeRepo) GetTrades(ctx context.Context) ([]*trade.Trade, error) {
     var trades []*trade.Trade
     err := t.db.Find(&trades).Error
