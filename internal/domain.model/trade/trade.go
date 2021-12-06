@@ -22,7 +22,7 @@ type Trade struct {
     UserEmail string  `gorm:"column:user_email"`
     Symbol    string  `gorm:"column:symbol"`
     OrderId   string  `gorm:"column:order_id"`
-    Type      int8    `gorm:"column:type"`
+    Type      Type    `gorm:"column:type"`
     Price     float64 `gorm:"column:price"`
     Quantity  float64 `gorm:"column:quantity"`
 }

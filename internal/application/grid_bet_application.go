@@ -19,7 +19,7 @@ import (
 
 func GridBetRun(ctx context.Context) {
     gridBet := bet.NewGridBet()
-    gridBet.Grid.LoadFromJSON(context.Background())
+    gridBet.Grid.LoadFromJSON(ctx)
     tp := &binance.TickerPrice{
         Symbol: gridBet.Grid.GetCoinType(),
     }
