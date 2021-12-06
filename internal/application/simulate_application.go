@@ -17,7 +17,7 @@ import (
  * @date 2021/12/6
  */
 
-func simulateGridBetRun(ctx context.Context) {
+func SimulateGridBetRun(ctx context.Context) {
     gridBet := bet.NewGridBet()
     gridBet.Grid.LoadFromJSON(ctx)
     tp := &binance.TickerPrice{
@@ -36,12 +36,13 @@ func simulateGridBetRun(ctx context.Context) {
         if gridBuyPrice >= curMarketPrice {
             // 买入
             t := &trade.Trade{
-                UserEmail: "rancho@simulate.com",
-                Symbol:    gridBet.Grid.GetCoinType(),
-                OrderId:   "simulate-" + util.RandString(10, false),
-                Type:      trade.TypeBuy,
-                Price:     gridBuyPrice,
-                Quantity:  buyQuantity,
+                UserEmail:  "rancho@simulate.com",
+                Symbol:     gridBet.Grid.GetCoinType(),
+                OrderId:    "simulate-" + util.RandString(10, false),
+                Type:       trade.TypeBuy,
+                Price:      gridBuyPrice,
+                Quantity:   buyQuantity,
+                IsSimulate: true,
             }
             t, err := repository.MySQL.Trade.InsertTrade(ctx, t)
             if err != nil {
