@@ -70,8 +70,8 @@ func NewMySQLRepository() (*MySQLRepository, error) {
     if config.Config.Env == string(config.EnvTesting) {
         db := mockMySQL()
         MySQL = &MySQLRepository{
-            User:  mysql.NewUserRepository(db),
-            Trade: mysql.NewTradeRepository(db),
+            User:  mysql.NewUserRepo(db),
+            Trade: mysql.NewTradeRepo(db),
             db:    db,
         }
 
@@ -95,7 +95,7 @@ func NewMySQLRepository() (*MySQLRepository, error) {
     sqlDB.SetMaxOpenConns(config.Config.MySQL.MaxOpenConns)
 
     MySQL = &MySQLRepository{
-        User: mysql.NewUserRepository(db),
+        User: mysql.NewUserRepo(db),
         db:   db,
     }
 
