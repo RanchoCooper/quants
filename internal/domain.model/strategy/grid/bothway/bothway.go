@@ -2,6 +2,7 @@ package bothway
 
 import (
     "quants/internal/domain.model/strategy/grid"
+    "quants/util"
 )
 
 /**
@@ -9,6 +10,16 @@ import (
  * @date 2021/12/5
  */
 
-type Bothway struct {
+const gridBothwayJSONFile = "bothway.json"
+
+type GridBothway struct {
     Grid grid.Grid
+}
+
+func NewGridBothway() *GridBothway {
+    return &GridBothway{
+        Grid: grid.Grid{
+            ConfigJSONFile: util.GetCurrentPath() + "/" + gridBothwayJSONFile,
+        },
+    }
 }
