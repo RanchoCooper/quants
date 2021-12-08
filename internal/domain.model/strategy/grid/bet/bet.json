@@ -1,7 +1,7 @@
 {
-    "next_buy_price": 627.9,
-    "grid_sell_price": 627.9,
-    "step": 0,
+    "next_buy_price": 4400.56,
+    "grid_sell_price": 4400.56,
+    "step": 1,
     "profit_ratio": 6,
     "double_throw_ratio": 5,
     "cointype": "ETHUSDT",

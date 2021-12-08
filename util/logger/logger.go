@@ -69,7 +69,7 @@ func init() {
         MaxSize:   500,
         MaxAge:    10,
         LocalTime: true,
-    }, "", log.LstdFlags).WithCaller(2)
+    }, "", log.LstdFlags)
 }
 
 func NewLogger(w io.Writer, prefix string, flag int) *Logger {
