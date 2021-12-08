@@ -111,7 +111,7 @@ func (b *Grid) GetQuantity(action ExchangeType) float64 {
     return quantity
 }
 
-func (b *Grid) ModifyPrice(ctx context.Context, dealPrice float64, step int) bool {
+func (b *Grid) AdjustPrice(ctx context.Context, dealPrice float64, step int) bool {
     b.NextBuyPrice = dealPrice * cast.ToFloat64(1-b.DoubleThrowRatio/100)
     b.GridSellPrice = dealPrice * cast.ToFloat64(1+b.ProfitRatio/100)
     b.Step = step

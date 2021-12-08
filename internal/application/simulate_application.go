@@ -18,26 +18,26 @@ import (
  */
 
 func SimulateGridBetRun(ctx context.Context) {
-    gridBet := bet.NewGridBet()
-    gridBet.Grid.LoadFromJSON(ctx)
+    gb := bet.NewGridBet()
+    gb.Grid.LoadFromJSON(ctx)
     tp := &binance.TickerPrice{
-        Symbol: gridBet.Grid.GetCoinType(),
+        Symbol: gb.Grid.GetCoinType(),
     }
 
     for {
-        curMarketPrice := tp.GetTickerPrice(ctx).Price      // 当前交易市价
-        gridBuyPrice := gridBet.Grid.GetBuyPrice()          // 当前网格买入价格
-        gridSellPrice := gridBet.Grid.GetSellPrice()        // 当前网格卖出价格
-        buyQuantity := gridBet.Grid.GetQuantity(grid.Buy)   // 买单量
-        sellQuantity := gridBet.Grid.GetQuantity(grid.Sell) // 卖单量
-        step := gridBet.Grid.GetStep()                      // 当前步数
+        curMarketPrice := tp.GetTickerPrice(ctx).Price // 当前交易市价
+        gridBuyPrice := gb.Grid.GetBuyPrice()          // 当前网格买入价格
+        gridSellPrice := gb.Grid.GetSellPrice()        // 当前网格卖出价格
+        buyQuantity := gb.Grid.GetQuantity(grid.Buy)   // 买单量
+        sellQuantity := gb.Grid.GetQuantity(grid.Sell) // 卖单量
+        step := gb.Grid.GetStep()                      // 当前步数
 
         // 满足买入价
-        if gridBuyPrice >= curMarketPrice {
+        if gb.ShouldBuy(curMarketPrice) {
             // 买入
             t := &trade.Trade{
                 UserEmail:  "rancho@simulate.com",
-                Symbol:     gridBet.Grid.GetCoinType(),
+                Symbol:     gb.Grid.GetCoinType(),
                 OrderId:    "simulate-" + util.RandString(10, false),
                 Type:       trade.TypeBuy,
                 Price:      gridBuyPrice,
@@ -52,15 +52,15 @@ func SimulateGridBetRun(ctx context.Context) {
         }
 
         // 满足卖出价
-        if gridSellPrice < curMarketPrice {
+        if gb.ShouldSell(curMarketPrice) {
             // 防止踏空，跟随价格上涨
             if step == 0 {
-                gridBet.Grid.ModifyPrice(ctx, gridSellPrice, step)
+                gb.Grid.AdjustPrice(ctx, gridSellPrice, step)
             } else {
                 // 卖出
                 t := &trade.Trade{
                     UserEmail: "rancho@simulate.com",
-                    Symbol:    gridBet.Grid.GetCoinType(),
+                    Symbol:    gb.Grid.GetCoinType(),
                     OrderId:   "simulate-" + util.RandString(10, false),
                     Type:      trade.TypeSell,
                     Price:     gridSellPrice,
