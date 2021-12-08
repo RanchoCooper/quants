@@ -5,7 +5,6 @@ import (
     "time"
 
     "quants/internal/domain.model/binance"
-    "quants/internal/domain.model/dingding"
     "quants/internal/domain.model/strategy/grid/bothway"
 )
 
@@ -20,7 +19,6 @@ func GridBothwayRun(ctx context.Context) {
     b := &binance.Binance{TickerPrice: binance.TickerPrice{
         Symbol: gridBothway.Grid.GetCoinType(),
     }}
-    ding := &dingding.DingDing{}
 
     for {
         curMarketPrice := b.GetTickerPrice(ctx).Price // 当前交易市价
