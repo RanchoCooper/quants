@@ -2,6 +2,7 @@ package application
 
 import (
     "context"
+    "time"
 
     "quants/internal/domain.model/binance"
     "quants/internal/domain.model/strategy/grid"
@@ -35,8 +36,9 @@ func SimulateGridBetRun(ctx context.Context) {
         // 满足买入价
         if gb.ShouldBuy(curMarketPrice) {
             // 买入
+            logger.Log.Infof(ctx, "simulate meet buy price, price: %f", gridBuyPrice)
             t := &trade.Trade{
-                UserEmail:  "rancho@simulate.com",
+                UserEmail:  SimulateUserEmail,
                 Symbol:     gb.Grid.GetCoinType(),
                 OrderId:    "simulate-" + util.RandString(10, false),
                 Type:       trade.TypeBuy,
@@ -49,22 +51,22 @@ func SimulateGridBetRun(ctx context.Context) {
                 logger.Log.Errorf(ctx, "simulateGridBetRun buy fail when InsertTrade, err: %s", err.Error())
                 return
             }
-        }
-
-        // 满足卖出价
-        if gb.ShouldSell(curMarketPrice) {
+        } else if gb.ShouldSell(curMarketPrice) {
+            // 满足卖出价
             // 防止踏空，跟随价格上涨
             if step == 0 {
                 gb.Grid.AdjustPrice(ctx, gridSellPrice, step)
             } else {
                 // 卖出
+                logger.Log.Infof(ctx, "simulate meet sell price, price: %f", gridSellPrice)
                 t := &trade.Trade{
-                    UserEmail: "rancho@simulate.com",
-                    Symbol:    gb.Grid.GetCoinType(),
-                    OrderId:   "simulate-" + util.RandString(10, false),
-                    Type:      trade.TypeSell,
-                    Price:     gridSellPrice,
-                    Quantity:  sellQuantity,
+                    UserEmail:  SimulateUserEmail,
+                    Symbol:     gb.Grid.GetCoinType(),
+                    OrderId:    "simulate-" + util.RandString(10, false),
+                    Type:       trade.TypeSell,
+                    Price:      gridSellPrice,
+                    Quantity:   sellQuantity,
+                    IsSimulate: true,
                 }
                 t, err := repository.MySQL.Trade.InsertTrade(ctx, t)
                 if err != nil {
@@ -72,9 +74,10 @@ func SimulateGridBetRun(ctx context.Context) {
                     return
                 }
             }
+        } else {
+            logger.Log.Infof(ctx, "当前市价: %f。未能满足交易，继续运行", curMarketPrice)
         }
 
-        logger.Log.Infof(ctx, "当前市价: %f。未能满足交易，继续运行", curMarketPrice)
+        time.Sleep(2 * time.Second)
     }
-
 }

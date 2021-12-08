@@ -27,5 +27,5 @@ CREATE TABLE IF NOT EXISTS `quant_trade` (
     `updated_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'updated at',
     `deleted_at` DATETIME COMMENT 'deleted at',
     PRIMARY KEY (`id`),
-    UNIQUE KEY unique_key_user_email(`user_email`)
+    UNIQUE KEY unique_key_order_id(`order_id`)
 ) ENGINE = InnoDB DEFAULT CHARACTER SET = utf8mb4 COMMENT = 'user table';

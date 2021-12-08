@@ -95,8 +95,9 @@ func NewMySQLRepository() (*MySQLRepository, error) {
     sqlDB.SetMaxOpenConns(config.Config.MySQL.MaxOpenConns)
 
     MySQL = &MySQLRepository{
-        User: mysql.NewUserRepo(db),
-        db:   db,
+        User:  mysql.NewUserRepo(db),
+        Trade: mysql.NewTradeRepo(db),
+        db:    db,
     }
 
     return MySQL, nil
