@@ -36,7 +36,7 @@ func GridBetRun(ctx context.Context) {
         step := gb.Grid.GetStep()                      // 当前步数
 
         // 满足买入价
-        if gb.ShouldBuy(curMarketPrice) {
+        if gb.Grid.ShouldBuy(curMarketPrice) {
             tradeResp, ok := b.Trade(ctx, &binance.TradeInfoVO{
                 Symbol:   gb.Grid.GetCoinType(),
                 Side:     "BUY",
@@ -58,7 +58,7 @@ func GridBetRun(ctx context.Context) {
         }
 
         // 满足卖出价
-        if gb.ShouldSell(curMarketPrice) {
+        if gb.Grid.ShouldSell(curMarketPrice) {
             // 防止踏空，跟随价格上涨
             if step == 0 {
                 gb.Grid.AdjustPrice(ctx, gridSellPrice, step)

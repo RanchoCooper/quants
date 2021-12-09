@@ -1,7 +1,11 @@
 package trade
 
 import (
+    "context"
+
     "gorm.io/gorm"
+
+    "quants/internal/port.adapter/repository"
 )
 
 /**
@@ -30,4 +34,8 @@ type Trade struct {
 
 func (Trade) TableName() string {
     return "quant_trade"
+}
+
+func (t *Trade) InsertTrade(ctx context.Context) (*Trade, error) {
+    return repository.MySQL.Trade.InsertTrade(ctx, t)
 }

@@ -35,24 +35,48 @@ type Grid struct {
     Quantity         []float64 `json:"quantity"`           // 交易数量
 }
 
-func (b Grid) String() string {
-    bf, _ := json.MarshalIndent(b, "", "    ")
+func (g Grid) String() string {
+    bf, _ := json.MarshalIndent(g, "", "    ")
     return string(bf)
 }
 
-func (b *Grid) LoadFromJSON(ctx context.Context) {
-    content := file.ReadFile(b.ConfigJSONFile)
+func (g *Grid) GetBuyPrice() float64 {
+    return g.NextBuyPrice
+}
+
+func (g *Grid) GetSellPrice() float64 {
+    return g.GridSellPrice
+}
+
+func (g *Grid) GetCoinType() string {
+    return g.Cointype
+}
+
+func (g *Grid) GetStep() int {
+    return g.Step
+}
+
+func (g Grid) ShouldBuy(curMarketPrice float64) bool {
+    return g.GetBuyPrice() > curMarketPrice
+}
+
+func (g Grid) ShouldSell(curMarketPrice float64) bool {
+    return g.GetSellPrice() < curMarketPrice
+}
+
+func (g *Grid) LoadFromJSON(ctx context.Context) {
+    content := file.ReadFile(g.ConfigJSONFile)
     if content == nil {
         return
     }
-    err := json.Unmarshal(content, b)
+    err := json.Unmarshal(content, g)
     if err != nil {
         logger.Log.Errorf(ctx, "json.Unmarshal fail when LoadFromJSON. err: %v", err)
     }
 }
 
-func (b *Grid) WriteToJSON(ctx context.Context) bool {
-    filePath := b.ConfigJSONFile
+func (g *Grid) WriteToJSON(ctx context.Context) bool {
+    filePath := g.ConfigJSONFile
     if _, err := os.Stat(filePath); err != nil {
         if os.IsNotExist(err) {
             _, err2 := os.Create(filePath)
@@ -73,7 +97,7 @@ func (b *Grid) WriteToJSON(ctx context.Context) bool {
     }
     defer f.Close()
 
-    content, err := json.MarshalIndent(b, "", "    ")
+    content, err := json.MarshalIndent(g, "", "    ")
     if err != nil {
         logger.Log.Errorf(ctx, "WriteToJSON fail when json.MarshalIndent, err: %v", err)
         return false
@@ -88,50 +112,34 @@ func (b *Grid) WriteToJSON(ctx context.Context) bool {
     return true
 }
 
-func (b *Grid) GetQuantity(action ExchangeType) float64 {
+func (g *Grid) GetQuantity(action ExchangeType) float64 {
     var curStep int
     if action == Buy {
-        curStep = b.Step
+        curStep = g.Step
     }
     if action == Sell {
-        curStep = b.Step + len(b.Quantity) - 1
+        curStep = g.Step + len(g.Quantity) - 1
     }
     quantity := 0.0
-    if curStep < len(b.Quantity) {
+    if curStep < len(g.Quantity) {
         if curStep == 0 {
-            quantity = b.Quantity[0]
+            quantity = g.Quantity[0]
         } else {
-            quantity = b.Quantity[curStep]
+            quantity = g.Quantity[curStep]
         }
     } else {
         // 当前仓位大于设置的仓位，取最后一位
-        quantity = b.Quantity[len(b.Quantity)-1]
+        quantity = g.Quantity[len(g.Quantity)-1]
     }
 
     return quantity
 }
 
-func (b *Grid) AdjustPrice(ctx context.Context, dealPrice float64, step int) bool {
-    b.NextBuyPrice = dealPrice * cast.ToFloat64(1-b.DoubleThrowRatio/100)
-    b.GridSellPrice = dealPrice * cast.ToFloat64(1+b.ProfitRatio/100)
-    b.Step = step
+func (g *Grid) AdjustPrice(ctx context.Context, dealPrice float64, step int) bool {
+    g.NextBuyPrice = dealPrice * cast.ToFloat64(1-g.DoubleThrowRatio/100)
+    g.GridSellPrice = dealPrice * cast.ToFloat64(1+g.ProfitRatio/100)
+    g.Step = step
 
-    logger.Log.Infof(ctx, "修改后的补仓价格为%f。修改后的网格价格为%f", b.NextBuyPrice, b.GridSellPrice)
-    return b.WriteToJSON(ctx)
-}
-
-func (b *Grid) GetBuyPrice() float64 {
-    return b.NextBuyPrice
-}
-
-func (b *Grid) GetSellPrice() float64 {
-    return b.GridSellPrice
-}
-
-func (b *Grid) GetCoinType() string {
-    return b.Cointype
-}
-
-func (b *Grid) GetStep() int {
-    return b.Step
+    logger.Log.Infof(ctx, "修改后的补仓价格为%f。修改后的网格价格为%f", g.NextBuyPrice, g.GridSellPrice)
+    return g.WriteToJSON(ctx)
 }

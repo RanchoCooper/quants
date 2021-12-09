@@ -8,7 +8,6 @@ import (
     "quants/internal/domain.model/strategy/grid"
     "quants/internal/domain.model/strategy/grid/bet"
     "quants/internal/domain.model/trade"
-    "quants/internal/port.adapter/repository"
     "quants/util"
     "quants/util/logger"
 )
@@ -34,7 +33,7 @@ func SimulateGridBetRun(ctx context.Context) {
         step := gb.Grid.GetStep()                      // 当前步数
 
         // 满足买入价
-        if gb.ShouldBuy(curMarketPrice) {
+        if gb.Grid.ShouldBuy(curMarketPrice) {
             // 买入
             logger.Log.Infof(ctx, "simulate meet buy price, price: %f", gridBuyPrice)
             t := &trade.Trade{
@@ -46,12 +45,12 @@ func SimulateGridBetRun(ctx context.Context) {
                 Quantity:   buyQuantity,
                 IsSimulate: true,
             }
-            t, err := repository.MySQL.Trade.InsertTrade(ctx, t)
+            _, err := t.InsertTrade(ctx)
             if err != nil {
                 logger.Log.Errorf(ctx, "simulateGridBetRun buy fail when InsertTrade, err: %s", err.Error())
                 return
             }
-        } else if gb.ShouldSell(curMarketPrice) {
+        } else if gb.Grid.ShouldSell(curMarketPrice) {
             // 满足卖出价
             // 防止踏空，跟随价格上涨
             if step == 0 {
@@ -68,7 +67,7 @@ func SimulateGridBetRun(ctx context.Context) {
                     Quantity:   sellQuantity,
                     IsSimulate: true,
                 }
-                t, err := repository.MySQL.Trade.InsertTrade(ctx, t)
+                _, err := t.InsertTrade(ctx)
                 if err != nil {
                     logger.Log.Errorf(ctx, "simulateGridBetRun sell fail when InsertTrade, err: %s", err.Error())
                     return

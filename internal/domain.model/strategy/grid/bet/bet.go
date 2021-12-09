@@ -23,11 +23,3 @@ func NewGridBet() *GridBet {
         },
     }
 }
-
-func (gb GridBet) ShouldBuy(curMarketPrice float64) bool {
-    return gb.Grid.GetBuyPrice() > curMarketPrice
-}
-
-func (gb GridBet) ShouldSell(curMarketPrice float64) bool {
-    return gb.Grid.GetSellPrice() < curMarketPrice
-}
