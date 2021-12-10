@@ -21,6 +21,13 @@ const (
     TypeSell
 )
 
+type ITradeRepo interface {
+    GetTrades(context.Context) ([]*Trade, error)
+    GetTradesByUser(context.Context, string) ([]*Trade, error)
+    GetTradesByOrderId(context.Context, string) (*Trade, error)
+    InsertTrade(context.Context, *Trade) (*Trade, error)
+}
+
 type Trade struct {
     gorm.Model
     UserEmail  string  `gorm:"column:user_email"`

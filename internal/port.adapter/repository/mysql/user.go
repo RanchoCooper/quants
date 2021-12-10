@@ -14,11 +14,6 @@ import (
  * @date 2021/12/5
  */
 
-type IUserRepo interface {
-    GetUsers(context.Context) ([]*user.User, error)
-    SaveUser(context.Context, *user.User) (*user.User, error)
-}
-
 type UserRepo struct {
     db *gorm.DB
 }
@@ -51,4 +46,4 @@ func (u *UserRepo) SaveUser(ctx context.Context, user *user.User) (*user.User, e
 }
 
 // UserRepo implements the IUserRepo interface
-var _ IUserRepo = &UserRepo{}
+var _ user.IUserRepo = &UserRepo{}

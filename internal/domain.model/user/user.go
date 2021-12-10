@@ -1,6 +1,8 @@
 package user
 
 import (
+    "context"
+
     "gorm.io/gorm"
 )
 
@@ -8,6 +10,11 @@ import (
  * @author Rancho
  * @date 2021/12/5
  */
+
+type IUserRepo interface {
+    GetUsers(context.Context) ([]*User, error)
+    SaveUser(context.Context, *User) (*User, error)
+}
 
 type User struct {
     gorm.Model

@@ -14,13 +14,6 @@ import (
  * @date 2021/12/6
  */
 
-type ITradeRepo interface {
-    GetTrades(context.Context) ([]*trade.Trade, error)
-    GetTradesByUser(context.Context, string) ([]*trade.Trade, error)
-    GetTradesByOrderId(context.Context, string) (*trade.Trade, error)
-    InsertTrade(context.Context, *trade.Trade) (*trade.Trade, error)
-}
-
 type TradeRepo struct {
     db *gorm.DB
 }
@@ -75,4 +68,4 @@ func (t TradeRepo) InsertTrade(ctx context.Context, trade *trade.Trade) (*trade.
 }
 
 // TradeRepo implements the ITradeRepo interface
-var _ ITradeRepo = &TradeRepo{}
+var _ trade.ITradeRepo = &TradeRepo{}
