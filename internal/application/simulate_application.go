@@ -8,6 +8,7 @@ import (
     "quants/internal/domain.model/strategy/grid"
     "quants/internal/domain.model/strategy/grid/bet"
     "quants/internal/domain.model/trade"
+    "quants/internal/port.adapter/repository"
     "quants/util"
     "quants/util/logger"
 )
@@ -45,7 +46,7 @@ func SimulateGridBetRun(ctx context.Context) {
                 Quantity:   buyQuantity,
                 IsSimulate: true,
             }
-            _, err := t.InsertTrade(ctx)
+            _, err := repository.MySQL.Trade.InsertTrade(ctx, t)
             if err != nil {
                 logger.Log.Errorf(ctx, "simulateGridBetRun buy fail when InsertTrade, err: %s", err.Error())
                 return
@@ -67,7 +68,7 @@ func SimulateGridBetRun(ctx context.Context) {
                     Quantity:   sellQuantity,
                     IsSimulate: true,
                 }
-                _, err := t.InsertTrade(ctx)
+                _, err := repository.MySQL.Trade.InsertTrade(ctx, t)
                 if err != nil {
                     logger.Log.Errorf(ctx, "simulateGridBetRun sell fail when InsertTrade, err: %s", err.Error())
                     return
