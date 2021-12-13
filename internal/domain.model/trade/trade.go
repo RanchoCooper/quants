@@ -4,8 +4,6 @@ import (
     "context"
 
     "gorm.io/gorm"
-
-    "quants/internal/port.adapter/repository"
 )
 
 /**
@@ -28,6 +26,7 @@ type ITradeRepo interface {
     InsertTrade(context.Context, *Trade) (*Trade, error)
 }
 
+// @autowire.init(set=domain)
 type Trade struct {
     gorm.Model
     UserEmail  string  `gorm:"column:user_email"`
@@ -41,8 +40,4 @@ type Trade struct {
 
 func (Trade) TableName() string {
     return "quant_trade"
-}
-
-func (t *Trade) InsertTrade(ctx context.Context) (*Trade, error) {
-    return repository.MySQL.Trade.InsertTrade(ctx, t)
 }
