@@ -4,8 +4,8 @@ import (
     "context"
     "time"
 
-    "quants/internal/domain.model/binance"
-    "quants/internal/domain.model/strategy/grid/bothway"
+    "quants/internal/domain/binance"
+    "quants/internal/domain/strategy/grid/bothway"
 )
 
 /**

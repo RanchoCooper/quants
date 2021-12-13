@@ -1,7 +1,8 @@
-package user
+package model
 
 import (
     "context"
+    "time"
 
     "gorm.io/gorm"
 )
@@ -12,17 +13,21 @@ import (
  */
 
 type IUserRepo interface {
+    GetUser(context.Context, *User) (*User, error)
     GetUsers(context.Context) ([]*User, error)
-    SaveUser(context.Context, *User) (*User, error)
+    SaveUser(context.Context, *User) error
 }
 
 type User struct {
-    gorm.Model
+    ID        int     `gorm:"primarykey"`
     UserName  string  `gorm:"column:user_name"`
     UserEmail string  `gorm:"column:user_email"`
     Asset     float64 `gorm:"column:asset"`
     Profit    float64 `gorm:"column:profit"`
     State     int     `gorm:"column:state"`
+    CreatedAt time.Time
+    UpdatedAt time.Time
+    DeletedAt gorm.DeletedAt `gorm:"index"`
 }
 
 func (User) TableName() string {

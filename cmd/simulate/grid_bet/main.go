@@ -3,7 +3,7 @@ package main
 import (
     "context"
 
-    "quants/internal/application"
+    "quants/internal/application/simulate"
 )
 
 /**
@@ -12,5 +12,5 @@ import (
  */
 
 func main() {
-    application.SimulateGridBetRun(context.Background())
+    simulate.SimulateGridBetRun(context.Background())
 }

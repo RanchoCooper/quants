@@ -15,6 +15,10 @@ import (
  * @date 2021/12/5
  */
 
+func TestInitEmulateUser(t *testing.T) {
+    InitEmulateUser(context.Background())
+}
+
 func TestAddUser(t *testing.T) {
     if config.Config.Env == string(config.EnvTesting) {
         return
