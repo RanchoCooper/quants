@@ -27,20 +27,20 @@ func InitEmulateUser(ctx context.Context) {
         return
     }
     u.Asset = global.SimulateInitialAsset
-    err = repository.MySQL.User.SaveUser(ctx, u)
+    err = repository.MySQL.User.CreateUser(ctx, u)
     if err != nil {
-        logger.Log.Errorf(ctx, "InitEmulateUser when SaveUser, err: %s", err.Error())
+        logger.Log.Errorf(ctx, "InitEmulateUser when CreateUser, err: %s", err.Error())
         return
     }
 }
 
 func AddUser(ctx context.Context, userName, userEmail string) bool {
-    err := repository.MySQL.User.SaveUser(ctx, &user.User{
+    err := repository.MySQL.User.CreateUser(ctx, &user.User{
         UserName:  userName,
         UserEmail: userEmail,
     })
     if err != nil {
-        logger.Log.Errorf(ctx, "AddUser fail when SaveUser, err: %v", err)
+        logger.Log.Errorf(ctx, "AddUser fail when CreateUser, err: %v", err)
         return false
     }
 

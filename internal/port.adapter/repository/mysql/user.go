@@ -4,6 +4,7 @@ import (
     "context"
     "errors"
 
+    "github.com/fatih/structs"
     "gorm.io/gorm"
 
     "quants/global"
@@ -23,13 +24,79 @@ func NewUserRepo(db *gorm.DB) *UserRepo {
     return &UserRepo{db: db}
 }
 
+func (u *UserRepo) CreateUser(ctx context.Context, user *model.User) error {
+    u.db = u.db.Session(&gorm.Session{
+        NewDB:   true,
+        Context: ctx,
+    })
+    err := u.db.Create(user).Error
+    if err != nil {
+        // if strings.Contains(strings.ToLower(err.Error()), "duplicate") {
+        // }
+        return err
+    }
+
+    return nil
+}
+
+func (u *UserRepo) DeleteUser(ctx context.Context, user *model.User) error {
+    u.db = u.db.Session(&gorm.Session{
+        NewDB:   true,
+        Context: ctx,
+    })
+    if user.ID != 0 {
+        return u.db.Delete(user).Error
+    }
+    if user.UserName != "" {
+        return u.db.Where("user_name = ?", user.UserName).Delete(&model.User{}).Error
+    }
+    if user.UserEmail != "" {
+        return u.db.Where("user_email = ?", user.UserEmail).Delete(&model.User{}).Error
+    }
+    return nil
+}
+
+func (u *UserRepo) UpdateUser(ctx context.Context, user *model.User) (*model.User, error) {
+    u.db = u.db.Session(&gorm.Session{
+        NewDB:   true,
+        Context: ctx,
+    })
+    if structs.IsZero(user) {
+        return nil, errors.New("can not delete with empty model")
+    }
+    if user.ID == 0 {
+        return nil, errors.New("update fail, need ID")
+    }
+    m := make(map[string]interface{})
+    if user.UserEmail != "" {
+        m["user_email"] = user.UserEmail
+    }
+    if user.UserName != "" {
+        m["user_name"] = user.UserName
+    }
+    if user.Asset != nil {
+        m["assert"] = user.Asset
+    }
+    if user.Profit != nil {
+        m["profit"] = user.Profit
+    }
+    if user.State != 0 {
+        m["state"] = user.State
+    }
+    err := u.db.Model(user).Updates(m).Error
+    return user, err
+}
+
 func (u *UserRepo) GetUser(ctx context.Context, user *model.User) (*model.User, error) {
-    u.db = u.db.Session(&gorm.Session{NewDB: true})
+    u.db = u.db.Session(&gorm.Session{
+        NewDB:   true,
+        Context: ctx,
+    })
     var result *model.User
-    if len(user.UserName) != 0 {
+    if user.UserName != "" {
         u.db = u.db.Where(user, "user_name")
     }
-    if len(user.UserEmail) != 0 {
+    if user.UserEmail != "" {
         u.db = u.db.Where(user, "user_email")
     }
     err := u.db.First(&result).Error
@@ -43,6 +110,10 @@ func (u *UserRepo) GetUser(ctx context.Context, user *model.User) (*model.User, 
 }
 
 func (u *UserRepo) GetUsers(ctx context.Context) ([]*model.User, error) {
+    u.db = u.db.Session(&gorm.Session{
+        NewDB:   true,
+        Context: ctx,
+    })
     var users []*model.User
     err := u.db.Find(&users).Error
     if errors.Is(err, gorm.ErrRecordNotFound) {
@@ -52,17 +123,6 @@ func (u *UserRepo) GetUsers(ctx context.Context) ([]*model.User, error) {
         return nil, global.ErrNotFound
     }
     return users, nil
-}
-
-func (u *UserRepo) SaveUser(ctx context.Context, user *model.User) error {
-    err := u.db.Create(user).Error
-    if err != nil {
-        // if strings.Contains(strings.ToLower(err.Error()), "duplicate") {
-        // }
-        return err
-    }
-
-    return nil
 }
 
 // UserRepo implements the IUserRepo interface
