@@ -1,13 +1,15 @@
-package application
+package simulate
 
 import (
     "context"
     "time"
 
-    "quants/internal/domain.model/binance"
-    "quants/internal/domain.model/strategy/grid"
-    "quants/internal/domain.model/strategy/grid/bet"
-    "quants/internal/domain.model/trade"
+    "quants/global"
+    "quants/internal/application"
+    "quants/internal/domain/binance"
+    model "quants/internal/domain/model/trade"
+    "quants/internal/domain/strategy/grid"
+    "quants/internal/domain/strategy/grid/bet"
     "quants/internal/port.adapter/repository"
     "quants/util"
     "quants/util/logger"
@@ -19,6 +21,8 @@ import (
  */
 
 func SimulateGridBetRun(ctx context.Context) {
+    application.InitEmulateUser(ctx)
+
     gb := bet.NewGridBet()
     gb.Grid.LoadFromJSON(ctx)
     tp := &binance.TickerPrice{
@@ -37,11 +41,11 @@ func SimulateGridBetRun(ctx context.Context) {
         if gb.Grid.ShouldBuy(curMarketPrice) {
             // 买入
             logger.Log.Infof(ctx, "simulate meet buy price, price: %f", gridBuyPrice)
-            t := &trade.Trade{
-                UserEmail:  SimulateUserEmail,
+            t := &model.Trade{
+                UserEmail:  global.SimulateUserEmail,
                 Symbol:     gb.Grid.GetCoinType(),
                 OrderId:    "simulate-" + util.RandString(10, false),
-                Type:       trade.TypeBuy,
+                Type:       model.TypeBuy,
                 Price:      gridBuyPrice,
                 Quantity:   buyQuantity,
                 IsSimulate: true,
@@ -59,11 +63,11 @@ func SimulateGridBetRun(ctx context.Context) {
             } else {
                 // 卖出
                 logger.Log.Infof(ctx, "simulate meet sell price, price: %f", gridSellPrice)
-                t := &trade.Trade{
-                    UserEmail:  SimulateUserEmail,
+                t := &model.Trade{
+                    UserEmail:  global.SimulateUserEmail,
                     Symbol:     gb.Grid.GetCoinType(),
                     OrderId:    "simulate-" + util.RandString(10, false),
-                    Type:       trade.TypeSell,
+                    Type:       model.TypeSell,
                     Price:      gridSellPrice,
                     Quantity:   sellQuantity,
                     IsSimulate: true,

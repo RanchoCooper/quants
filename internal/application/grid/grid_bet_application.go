@@ -1,14 +1,14 @@
-package application
+package grid
 
 import (
     "context"
     "fmt"
     "time"
 
-    "quants/internal/domain.model/binance"
-    "quants/internal/domain.model/dingding"
-    "quants/internal/domain.model/strategy/grid"
-    "quants/internal/domain.model/strategy/grid/bet"
+    "quants/internal/domain/binance"
+    "quants/internal/domain/dingding"
+    "quants/internal/domain/strategy/grid"
+    "quants/internal/domain/strategy/grid/bet"
     "quants/util/logger"
 )
 
