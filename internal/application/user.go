@@ -4,6 +4,7 @@ import (
     "context"
 
     "quants/global"
+    model "quants/internal/domain/model/user"
     "quants/internal/port.adapter/repository"
     "quants/util/logger"
 )
@@ -14,10 +15,10 @@ import (
  */
 
 func InitEmulateUser(ctx context.Context) {
-    u := &user.User{UserEmail: global.SimulateUserEmail}
+    u := &model.User{UserEmail: global.SimulateUserEmail}
     u, err := repository.MySQL.User.GetUser(ctx, u)
     if u == nil {
-        u = &user.User{
+        u = &model.User{
             UserName:  global.SimulateUserName,
             UserEmail: global.SimulateUserEmail,
         }
@@ -26,7 +27,8 @@ func InitEmulateUser(ctx context.Context) {
         logger.Log.Errorf(ctx, "InitEmulateUser when GetUser, err: %s", err.Error())
         return
     }
-    u.Asset = global.SimulateInitialAsset
+    asset := global.SimulateInitialAsset
+    u.Asset = &asset
     err = repository.MySQL.User.CreateUser(ctx, u)
     if err != nil {
         logger.Log.Errorf(ctx, "InitEmulateUser when CreateUser, err: %s", err.Error())
@@ -35,7 +37,7 @@ func InitEmulateUser(ctx context.Context) {
 }
 
 func AddUser(ctx context.Context, userName, userEmail string) bool {
-    err := repository.MySQL.User.CreateUser(ctx, &user.User{
+    err := repository.MySQL.User.CreateUser(ctx, &model.User{
         UserName:  userName,
         UserEmail: userEmail,
     })
@@ -47,7 +49,7 @@ func AddUser(ctx context.Context, userName, userEmail string) bool {
     return true
 }
 
-func GetUsers(ctx context.Context) []*user.User {
+func GetUsers(ctx context.Context) []*model.User {
     users, err := repository.MySQL.User.GetUsers(ctx)
     if err != nil {
         logger.Log.Errorf(ctx, "GetUsers fail, err: %v", err)

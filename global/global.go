@@ -12,7 +12,7 @@ import (
 const (
     SimulateUserName     = "rancho-simulate"
     SimulateUserEmail    = "rancho@simulate.com"
-    SimulateInitialAsset = 50000
+    SimulateInitialAsset = 50000.0
 )
 
 var (

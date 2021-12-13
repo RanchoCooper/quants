@@ -22,9 +22,13 @@ func TestUserRepo_GetUsers(t *testing.T) {
 }
 
 func TestUserRepo_SaveUser(t *testing.T) {
+    asset := 0.0
+    profit := 0.0
     user := &model.User{
         UserName:  util.RandString(10, false),
         UserEmail: util.RandString(10, false),
+        Asset:     &asset,
+        Profit:    &profit,
     }
     err := MySQL.User.CreateUser(ctx, user)
     assert.Nil(t, err)
