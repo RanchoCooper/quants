@@ -30,8 +30,6 @@ func mockMySQL() (*gorm.DB, sqlmock.Sqlmock) {
     mock.ExpectQuery("SELECT VERSION()").WithArgs().WillReturnRows(
         mock.NewRows(columns).FromCSVString("1"),
     )
-    // mock.ExpectExec("INSERT INTO `quant_user`").WillReturnResult(sqlmock.NewResult(1, 1))
-    // mock.ExpectQuery("SELECT (.+) FROM `quant_user`").WillReturnRows(sqlmock.NewRows([]string{"id", "name"}).AddRow(1, "test1"))
     db, err := gorm.Open(dialector, &gorm.Config{})
     MySQL = &MySQLRepository{
         User:  NewUserRepo(db),
