@@ -10,7 +10,7 @@ log:
   log_file_ext: .log
 mysql:
   user: "root"
-  password: ""
+  password: "root"
   host: "localhost"
   port: 3306
   database: "quant"
