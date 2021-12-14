@@ -6,7 +6,6 @@ import (
     "os"
     "time"
 
-    "github.com/DATA-DOG/go-sqlmock"
     driver "gorm.io/driver/mysql"
     "gorm.io/gorm"
     "gorm.io/gorm/logger"
@@ -39,28 +38,7 @@ func init() {
     }
 }
 
-func mockMySQL() *gorm.DB {
-    sqlDB, mock, err := sqlmock.New()
-    if err != nil {
-        panic("mock MySQL fail, err: " + err.Error())
-    }
-    dialector := driver.New(driver.Config{
-        Conn:       sqlDB,
-        DriverName: "mysql",
-    })
-    // a SELECT VERSION() query will be run when gorm opens the database, so we need to expect that here
-    columns := []string{"version"}
-    mock.ExpectQuery("SELECT VERSION()").WithArgs().WillReturnRows(
-        mock.NewRows(columns).FromCSVString("1"),
-    )
-    mock.ExpectExec("INSERT INTO `quant_user`").WillReturnResult(sqlmock.NewResult(1, 1))
-    mock.ExpectQuery("SELECT (.+) FROM `quant_user`").WillReturnRows(sqlmock.NewRows([]string{"id", "name"}).AddRow(1, "test1"))
-    db, err := gorm.Open(dialector, &gorm.Config{})
-
-    return db
-}
-
-func NewMySQLRepository() (*MySQLRepository, error) {
+func NewGormDB() (*gorm.DB, error) {
     dsn := fmt.Sprintf("%s:%s@tcp(%s)/%s?charset=%s&parseTime=%t&loc=%s",
         config.Config.MySQL.User,
         config.Config.MySQL.Password,
@@ -70,17 +48,6 @@ func NewMySQLRepository() (*MySQLRepository, error) {
         config.Config.MySQL.ParseTime,
         config.Config.MySQL.TimeZone,
     )
-
-    if config.Config.Env == string(config.EnvTesting) {
-        db := mockMySQL()
-        MySQL = &MySQLRepository{
-            User:  NewUserRepo(db),
-            Trade: NewTradeRepo(db),
-            db:    db,
-        }
-
-        return MySQL, nil
-    }
 
     db, err := gorm.Open(driver.Open(dsn), &gorm.Config{
         NamingStrategy: schema.NamingStrategy{
@@ -106,6 +73,14 @@ func NewMySQLRepository() (*MySQLRepository, error) {
     sqlDB.SetMaxIdleConns(config.Config.MySQL.MaxIdleConns)
     sqlDB.SetMaxOpenConns(config.Config.MySQL.MaxOpenConns)
 
+    return db, nil
+}
+
+func NewMySQLRepository() (*MySQLRepository, error) {
+    db, err := NewGormDB()
+    if err != nil {
+        return nil, err
+    }
     MySQL = &MySQLRepository{
         User:  NewUserRepo(db),
         Trade: NewTradeRepo(db),
