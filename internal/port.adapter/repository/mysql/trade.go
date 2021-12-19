@@ -6,7 +6,7 @@ import (
 
     "gorm.io/gorm"
 
-    "quants/internal/domain/model/trade"
+    "quants/internal/domain.model/entity/trade"
 )
 
 /**

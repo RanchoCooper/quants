@@ -10,7 +10,7 @@ import (
     "gorm.io/gorm"
 
     "quants/global"
-    "quants/internal/domain/model/user"
+    "quants/internal/domain.model/entity/user"
     "quants/util"
 )
 

@@ -8,7 +8,7 @@ import (
     "gorm.io/gorm"
 
     "quants/global"
-    "quants/internal/domain/model/user"
+    "quants/internal/domain.model/entity/user"
 )
 
 /**
@@ -62,7 +62,7 @@ func (u *UserRepo) UpdateUser(ctx context.Context, user *model.User) (*model.Use
         Context: ctx,
     })
     if structs.IsZero(user) {
-        return nil, errors.New("can not delete with empty model")
+        return nil, errors.New("can not delete with empty entity")
     }
     if user.ID == 0 {
         return nil, errors.New("update fail, need ID")

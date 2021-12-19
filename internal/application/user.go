@@ -4,7 +4,7 @@ import (
     "context"
 
     "quants/global"
-    model "quants/internal/domain/model/user"
+    model "quants/internal/domain.model/entity/user"
     "quants/internal/port.adapter/repository"
     "quants/util/logger"
 )

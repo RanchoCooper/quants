@@ -1,7 +1,7 @@
 package bothway
 
 import (
-    "quants/internal/domain/strategy/grid"
+    "quants/internal/domain.model/strategy/grid"
     "quants/util"
 )
 
