@@ -17,22 +17,22 @@ import (
 func InitEmulateUser(ctx context.Context) {
     u := &model.User{UserEmail: global.SimulateUserEmail}
     u, err := repository.MySQL.User.GetUser(ctx, u)
+    if err != nil {
+        logger.Log.Errorf(ctx, "InitEmulateUser when GetUser, err: %s", err.Error())
+        return
+    }
     if u == nil {
         u = &model.User{
             UserName:  global.SimulateUserName,
             UserEmail: global.SimulateUserEmail,
         }
-    }
-    if err != nil {
-        logger.Log.Errorf(ctx, "InitEmulateUser when GetUser, err: %s", err.Error())
-        return
-    }
-    asset := global.SimulateInitialAsset
-    u.Asset = &asset
-    err = repository.MySQL.User.CreateUser(ctx, u)
-    if err != nil {
-        logger.Log.Errorf(ctx, "InitEmulateUser when CreateUser, err: %s", err.Error())
-        return
+        asset := global.SimulateInitialAsset
+        u.Asset = &asset
+        err = repository.MySQL.User.CreateUser(ctx, u)
+        if err != nil {
+            logger.Log.Errorf(ctx, "InitEmulateUser when CreateUser, err: %s", err.Error())
+            return
+        }
     }
 }
 
