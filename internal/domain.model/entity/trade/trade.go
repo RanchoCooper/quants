@@ -26,7 +26,6 @@ type ITradeRepo interface {
     InsertTrade(context.Context, *Trade) (*Trade, error)
 }
 
-// @autowire.init(set=domain.entity)
 type Trade struct {
     gorm.Model
     UserEmail  string  `gorm:"column:user_email"`

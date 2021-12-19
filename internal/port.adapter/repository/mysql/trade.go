@@ -14,7 +14,6 @@ import (
  * @date 2021/12/6
  */
 
-// @autowire(set=repository,trade.ITradeRepo)
 type TradeRepo struct {
     db *gorm.DB
 }
