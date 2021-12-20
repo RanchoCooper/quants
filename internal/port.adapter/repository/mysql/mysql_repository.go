@@ -4,6 +4,7 @@ import (
     "fmt"
     "log"
     "os"
+    "sync"
     "time"
 
     driver "gorm.io/driver/mysql"
@@ -19,7 +20,10 @@ import (
  * @date 2021/12/13
  */
 
-var MySQL *MySQLRepository
+var (
+    MySQL *MySQLRepository
+    once  sync.Once
+)
 
 type MySQLRepository struct {
     User  *UserRepo
@@ -28,14 +32,13 @@ type MySQLRepository struct {
 }
 
 func init() {
-    var err error
-    if MySQL == nil {
+    once.Do(func() {
+        var err error
         MySQL, err = NewMySQLRepository()
         if err != nil {
             panic("init MySQL fail, err: " + err.Error())
         }
-        _ = MySQL
-    }
+    })
 }
 
 func NewGormDB() (*gorm.DB, error) {
