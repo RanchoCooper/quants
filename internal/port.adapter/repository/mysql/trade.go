@@ -6,7 +6,7 @@ import (
 
     "gorm.io/gorm"
 
-    "quants/internal/domain.model/entity/trade"
+    "quants/internal/domain.model/entity"
 )
 
 /**
@@ -22,8 +22,8 @@ func NewTradeRepo(db *gorm.DB) *TradeRepo {
     return &TradeRepo{db: db}
 }
 
-func (t TradeRepo) GetTrades(ctx context.Context) ([]*model.Trade, error) {
-    var trades []*model.Trade
+func (t TradeRepo) GetTrades(ctx context.Context) ([]*entity.Trade, error) {
+    var trades []*entity.Trade
     err := t.db.Find(&trades).Error
     if errors.Is(err, gorm.ErrRecordNotFound) {
         return nil, nil
@@ -34,8 +34,8 @@ func (t TradeRepo) GetTrades(ctx context.Context) ([]*model.Trade, error) {
     return trades, nil
 }
 
-func (t TradeRepo) GetTradesByUser(ctx context.Context, userEmail string) ([]*model.Trade, error) {
-    var trades []*model.Trade
+func (t TradeRepo) GetTradesByUser(ctx context.Context, userEmail string) ([]*entity.Trade, error) {
+    var trades []*entity.Trade
     err := t.db.Where("user_email = ?", userEmail).Find(&trades).Error
     if errors.Is(err, gorm.ErrRecordNotFound) {
         return nil, nil
@@ -46,8 +46,8 @@ func (t TradeRepo) GetTradesByUser(ctx context.Context, userEmail string) ([]*mo
     return trades, nil
 }
 
-func (t TradeRepo) GetTradesByOrderId(ctx context.Context, orderId string) (*model.Trade, error) {
-    var trade *model.Trade
+func (t TradeRepo) GetTradesByOrderId(ctx context.Context, orderId string) (*entity.Trade, error) {
+    var trade *entity.Trade
     err := t.db.Where("user_email = ?", orderId).Take(&trade).Error
     if errors.Is(err, gorm.ErrRecordNotFound) {
         return nil, nil
@@ -58,7 +58,7 @@ func (t TradeRepo) GetTradesByOrderId(ctx context.Context, orderId string) (*mod
     return trade, nil
 }
 
-func (t TradeRepo) InsertTrade(ctx context.Context, trade *model.Trade) (*model.Trade, error) {
+func (t TradeRepo) InsertTrade(ctx context.Context, trade *entity.Trade) (*entity.Trade, error) {
     err := t.db.Create(trade).Error
     if err != nil {
         return nil, err
@@ -68,4 +68,4 @@ func (t TradeRepo) InsertTrade(ctx context.Context, trade *model.Trade) (*model.
 }
 
 // TradeRepo implements the ITradeRepo interface
-var _ model.ITradeRepo = &TradeRepo{}
+var _ entity.ITradeRepo = &TradeRepo{}

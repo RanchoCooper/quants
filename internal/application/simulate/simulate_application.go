@@ -7,7 +7,7 @@ import (
     "quants/global"
     "quants/internal/application"
     "quants/internal/domain.model/binance"
-    model "quants/internal/domain.model/entity/trade"
+    model "quants/internal/domain.model/entity"
     "quants/internal/domain.model/strategy/grid"
     "quants/internal/domain.model/strategy/grid/bet"
     "quants/internal/port.adapter/repository"

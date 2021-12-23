@@ -10,7 +10,7 @@ import (
     "gorm.io/gorm"
 
     "quants/global"
-    "quants/internal/domain.model/entity/user"
+    "quants/internal/domain.model/entity"
     "quants/util"
 )
 
@@ -50,7 +50,7 @@ func (s *Suite) TestUserRepo_SaveUser() {
     s.mock.ExpectCommit()
     asset := 0.0
     profit := 0.0
-    user := &model.User{
+    user := &entity.User{
         UserName:  util.RandString(10, false),
         UserEmail: util.RandString(10, false),
         Asset:     &asset,
@@ -63,7 +63,7 @@ func (s *Suite) TestUserRepo_SaveUser() {
 
 func (s *Suite) TestUserRepo_UpdateUser() {
     s.Run("update empty object", func() {
-        user := &model.User{}
+        user := &entity.User{}
         user, err := MySQL.User.UpdateUser(ctx, user)
         s.Error(err)
     })
@@ -72,7 +72,7 @@ func (s *Suite) TestUserRepo_UpdateUser() {
         s.mock.ExpectBegin()
         s.mock.ExpectExec("UPDATE `quant_user` SET").WillReturnResult(sqlmock.NewResult(1, 1))
         s.mock.ExpectCommit()
-        user := &model.User{
+        user := &entity.User{
             ID:    2,
             State: 2,
         }
@@ -85,7 +85,7 @@ func (s *Suite) TestUserRepo_UpdateUser() {
         s.mock.ExpectBegin()
         s.mock.ExpectExec("UPDATE `quant_user` SET").WillReturnResult(sqlmock.NewResult(1, 1))
         s.mock.ExpectCommit()
-        user := &model.User{
+        user := &entity.User{
             ID:    2,
             State: 0,
         }
@@ -98,7 +98,7 @@ func (s *Suite) TestUserRepo_UpdateUser() {
 func (s *Suite) TestUserRepo_GetUser() {
     s.Run("normal GetUser", func() {
         s.mock.ExpectQuery(regexp.QuoteMeta("SELECT * FROM `quant_user` WHERE `quant_user`.`user_name` = ? AND `quant_user`.`user_email` = ? AND `quant_user`.`deleted_at` IS NULL ORDER BY `quant_user`.`id` LIMIT 1")).WillReturnRows(sqlmock.NewRows([]string{"id", "user_name", "user_email"}).AddRow(2, "rancho-simulate", "rancho@simulate.com"))
-        user := &model.User{
+        user := &entity.User{
             UserName:  global.SimulateUserName,
             UserEmail: global.SimulateUserEmail,
         }
@@ -111,7 +111,7 @@ func (s *Suite) TestUserRepo_GetUser() {
 
     s.Run("get first record", func() {
         s.mock.ExpectQuery(regexp.QuoteMeta("SELECT * FROM `quant_user` WHERE `quant_user`.`deleted_at` IS NULL ORDER BY `quant_user`.`id` LIMIT 1")).WillReturnRows(sqlmock.NewRows([]string{"id", "user_name", "user_email"}).AddRow(1, "rancho-simulate", "rancho@simulate.com"))
-        user := &model.User{}
+        user := &entity.User{}
         u, err := MySQL.User.GetUser(ctx, user) // return first user record
         s.NoError(err)
         s.Equal(1, u.ID)
@@ -119,7 +119,7 @@ func (s *Suite) TestUserRepo_GetUser() {
 
     s.Run("not exists, get first user record", func() {
         s.mock.ExpectQuery(regexp.QuoteMeta("SELECT * FROM `quant_user` WHERE `quant_user`.`user_name` = ? AND `quant_user`.`deleted_at` IS NULL ORDER BY `quant_user`.`id` LIMIT 1")).WillReturnRows(sqlmock.NewRows([]string{"id", "user_name", "user_email"}).AddRow(1, "rancho-simulate", "rancho@simulate.com"))
-        user := &model.User{
+        user := &entity.User{
             UserName: "not exists",
         }
         u, err := MySQL.User.GetUser(ctx, user) // return first user record

@@ -8,7 +8,7 @@ import (
     "gorm.io/gorm"
 
     "quants/global"
-    "quants/internal/domain.model/entity/user"
+    "quants/internal/domain.model/entity"
 )
 
 /**
@@ -24,7 +24,7 @@ func NewUserRepo(db *gorm.DB) *UserRepo {
     return &UserRepo{db: db}
 }
 
-func (u *UserRepo) CreateUser(ctx context.Context, user *model.User) error {
+func (u *UserRepo) CreateUser(ctx context.Context, user *entity.User) error {
     u.db = u.db.Session(&gorm.Session{
         NewDB:   true,
         Context: ctx,
@@ -39,7 +39,7 @@ func (u *UserRepo) CreateUser(ctx context.Context, user *model.User) error {
     return nil
 }
 
-func (u *UserRepo) DeleteUser(ctx context.Context, user *model.User) error {
+func (u *UserRepo) DeleteUser(ctx context.Context, user *entity.User) error {
     u.db = u.db.Session(&gorm.Session{
         NewDB:   true,
         Context: ctx,
@@ -48,15 +48,15 @@ func (u *UserRepo) DeleteUser(ctx context.Context, user *model.User) error {
         return u.db.Delete(user).Error
     }
     if user.UserName != "" {
-        return u.db.Where("user_name = ?", user.UserName).Delete(&model.User{}).Error
+        return u.db.Where("user_name = ?", user.UserName).Delete(&entity.User{}).Error
     }
     if user.UserEmail != "" {
-        return u.db.Where("user_email = ?", user.UserEmail).Delete(&model.User{}).Error
+        return u.db.Where("user_email = ?", user.UserEmail).Delete(&entity.User{}).Error
     }
     return nil
 }
 
-func (u *UserRepo) UpdateUser(ctx context.Context, user *model.User) (*model.User, error) {
+func (u *UserRepo) UpdateUser(ctx context.Context, user *entity.User) (*entity.User, error) {
     u.db = u.db.Session(&gorm.Session{
         NewDB:   true,
         Context: ctx,
@@ -87,12 +87,12 @@ func (u *UserRepo) UpdateUser(ctx context.Context, user *model.User) (*model.Use
     return user, err
 }
 
-func (u *UserRepo) GetUser(ctx context.Context, user *model.User) (*model.User, error) {
+func (u *UserRepo) GetUser(ctx context.Context, user *entity.User) (*entity.User, error) {
     u.db = u.db.Session(&gorm.Session{
         NewDB:   true,
         Context: ctx,
     })
-    var result *model.User
+    var result *entity.User
     if user.UserName != "" {
         u.db = u.db.Where(user, "user_name")
     }
@@ -109,12 +109,12 @@ func (u *UserRepo) GetUser(ctx context.Context, user *model.User) (*model.User, 
     return result, nil
 }
 
-func (u *UserRepo) GetUsers(ctx context.Context) ([]*model.User, error) {
+func (u *UserRepo) GetUsers(ctx context.Context) ([]*entity.User, error) {
     u.db = u.db.Session(&gorm.Session{
         NewDB:   true,
         Context: ctx,
     })
-    var users []*model.User
+    var users []*entity.User
     err := u.db.Find(&users).Error
     if errors.Is(err, gorm.ErrRecordNotFound) {
         return nil, nil
@@ -126,4 +126,4 @@ func (u *UserRepo) GetUsers(ctx context.Context) ([]*model.User, error) {
 }
 
 // UserRepo implements the IUserRepo interface
-var _ model.IUserRepo = &UserRepo{}
+var _ entity.IUserRepo = &UserRepo{}
