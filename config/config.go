@@ -17,13 +17,6 @@ const (
     privateConfigFilePath = "/config.private.yaml"
 )
 
-type EnvType string
-
-const (
-    EnvTesting EnvType = "testing"
-    EnvLocal   EnvType = "local"
-)
-
 type binanceConfig struct {
     Key    string `yaml:"key"`
     Secret string `yaml:"secret"`
