@@ -46,13 +46,24 @@ type mysqlConfig struct {
     ParseTime    bool   `yaml:"parse_time"`
     TimeZone     string `yaml:"time_zone"`
 }
+type redisConfig struct {
+    Addr         string
+    UserName     string
+    Password     string
+    DB           int
+    PoolSize     int
+    IdleTimeout  int
+    MinIdleConns int
+}
 
 type config struct {
+    app      string          `yaml:"app"`
     Env      string          `yaml:"env"`
     Log      *logConfig      `yaml:"log"`
     Binance  *binanceConfig  `yaml:"binance"`
     DingDing *dingDingConfig `yaml:"dingding"`
     MySQL    *mysqlConfig    `yaml:"mysql"`
+    Redis    *redisConfig    `yaml:"redis"`
 }
 
 var Config = &config{}
@@ -72,16 +83,13 @@ func readYamlConfig(configPath string) {
     }
 }
 
-func init() {
+func Init() {
     configPath := util.GetCurrentPath()
 
     readYamlConfig(configPath + configFilePath)
-
     // read private sensitive configs
-    if Config.Binance.Key == "" || Config.Binance.Secret == "" {
-        // read private config
-        readYamlConfig(configPath + privateConfigFilePath)
-    }
+    readYamlConfig(configPath + privateConfigFilePath)
+
     bf, _ := json.MarshalIndent(Config, "", "    ")
     fmt.Printf("Config:\n%s\n", string(bf))
 }

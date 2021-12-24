@@ -5,10 +5,10 @@ import (
     "fmt"
     "time"
 
-    "quants/internal/domain.model/binance"
-    "quants/internal/domain.model/dingding"
-    "quants/internal/domain.model/strategy/grid"
-    "quants/internal/domain.model/strategy/grid/bet"
+    binance2 "quants/internal/domain.model/service/binance"
+    "quants/internal/domain.model/service/dingding"
+    "quants/internal/domain.model/service/strategy/grid"
+    "quants/internal/domain.model/service/strategy/grid/bet"
     "quants/util/logger"
 )
 
@@ -20,8 +20,8 @@ import (
 func GridBetRun(ctx context.Context) {
     gb := bet.NewGridBet()
     gb.Grid.LoadFromJSON(context.Background())
-    b := &binance.Binance{
-        TickerPrice: binance.TickerPrice{
+    b := &binance2.Binance{
+        TickerPrice: binance2.TickerPrice{
             Symbol: gb.Grid.GetCoinType(),
         },
     }
@@ -37,7 +37,7 @@ func GridBetRun(ctx context.Context) {
 
         // 满足买入价
         if gb.Grid.ShouldBuy(curMarketPrice) {
-            tradeResp, ok := b.Trade(ctx, &binance.TradeInfoVO{
+            tradeResp, ok := b.Trade(ctx, &binance2.TradeInfoVO{
                 Symbol:   gb.Grid.GetCoinType(),
                 Side:     "BUY",
                 Quantity: buyQuantity,
@@ -63,7 +63,7 @@ func GridBetRun(ctx context.Context) {
             if step == 0 {
                 gb.Grid.AdjustPrice(ctx, gridSellPrice, step)
             } else {
-                tradeResp, ok := b.Trade(ctx, &binance.TradeInfoVO{
+                tradeResp, ok := b.Trade(ctx, &binance2.TradeInfoVO{
                     Symbol:   gb.Grid.GetCoinType(),
                     Side:     "SELL",
                     Quantity: sellQuantity,

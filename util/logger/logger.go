@@ -9,11 +9,11 @@ import (
     "runtime"
     "time"
 
-    "quants/config"
-    "quants/util"
-
     "github.com/gin-gonic/gin"
     "gopkg.in/natefinch/lumberjack.v2"
+
+    "quants/config"
+    "quants/util"
 )
 
 /**
@@ -63,6 +63,7 @@ type Logger struct {
 }
 
 func init() {
+    config.Init()
     fileName := util.GetCurrentPath() + "/../.." + config.Config.Log.LogSavePath + "/" + config.Config.Log.LogFileName + config.Config.Log.LogFileExt
     Log = NewLogger(&lumberjack.Logger{
         Filename:  fileName,

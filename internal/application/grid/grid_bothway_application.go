@@ -4,8 +4,8 @@ import (
     "context"
     "time"
 
-    "quants/internal/domain.model/binance"
-    "quants/internal/domain.model/strategy/grid/bothway"
+    binance2 "quants/internal/domain.model/service/binance"
+    "quants/internal/domain.model/service/strategy/grid/bothway"
 )
 
 /**
@@ -16,7 +16,7 @@ import (
 func GridBothwayRun(ctx context.Context) {
     gridBothway := bothway.NewGridBothway()
     gridBothway.Grid.LoadFromJSON(context.Background())
-    b := &binance.Binance{TickerPrice: binance.TickerPrice{
+    b := &binance2.Binance{TickerPrice: binance2.TickerPrice{
         Symbol: gridBothway.Grid.GetCoinType(),
     }}
 
