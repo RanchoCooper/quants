@@ -12,8 +12,9 @@ import (
  */
 
 type IUserRepo interface {
-    CreateUser(context.Context, *entity.User) error
-    DeleteUser(context.Context, *entity.User) error
-    GetUser(context.Context, *entity.User) (*entity.User, error)
-    GetUsers(context.Context) ([]*entity.User, error)
+    Create(context.Context, *entity.User) (*entity.User, error)
+    Delete(context.Context, int64) error
+    Update(ctx context.Context, user *entity.User) error
+    Get(context.Context, int64) (*entity.User, error)
+    FindByEmail(context.Context, string) (*entity.User, error)
 }

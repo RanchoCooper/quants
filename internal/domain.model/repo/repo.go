@@ -13,7 +13,7 @@ import (
  * @date 2021/12/24
  */
 
-type IExampleRepository interface {
+type IExampleRepo interface {
     Create(ctx context.Context, dto dto.CreateExampleReq) (*entity.Example, error)
     Delete(ctx context.Context, ID int) error
     Save(ctx context.Context, entity *entity.Example) error

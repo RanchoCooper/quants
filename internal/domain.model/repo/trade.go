@@ -12,8 +12,9 @@ import (
  */
 
 type ITradeRepo interface {
-    GetTrades(context.Context) ([]*entity.Trade, error)
-    GetTradesByUser(context.Context, string) ([]*entity.Trade, error)
-    GetTradesByOrderId(context.Context, string) (*entity.Trade, error)
-    InsertTrade(context.Context, *entity.Trade) (*entity.Trade, error)
+    Create(context.Context, *entity.Trade) (*entity.Trade, error)
+    Delete(context.Context, int64) error
+    Update(ctx context.Context, user *entity.Trade) error
+    Get(context.Context, int64) (*entity.Trade, error)
+    FindByOrderID(context.Context, string) (*entity.Trade, error)
 }

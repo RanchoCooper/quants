@@ -19,7 +19,7 @@ import (
  */
 
 type ExampleService struct {
-    Repository repo.IExampleRepository
+    Repository repo.IExampleRepo
 }
 
 func NewExampleService(ctx context.Context) *ExampleService {

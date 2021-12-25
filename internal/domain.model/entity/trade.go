@@ -1,8 +1,6 @@
 package entity
 
 import (
-    "context"
-
     "gorm.io/gorm"
 )
 
@@ -19,13 +17,6 @@ const (
     TypeSell
 )
 
-type ITradeRepo interface {
-    GetTrades(context.Context) ([]*Trade, error)
-    GetTradesByUser(context.Context, string) ([]*Trade, error)
-    GetTradesByOrderId(context.Context, string) (*Trade, error)
-    InsertTrade(context.Context, *Trade) (*Trade, error)
-}
-
 type Trade struct {
     gorm.Model
     UserEmail  string  `gorm:"column:user_email"`
@@ -35,8 +26,13 @@ type Trade struct {
     Price      float64 `gorm:"column:price"`
     Quantity   float64 `gorm:"column:quantity"`
     IsSimulate bool    `gorm:"column:is_simulate"`
+    changeMap  map[string]interface{}
 }
 
 func (Trade) TableName() string {
     return "quant_trade"
+}
+
+func (t *Trade) GetChangeMap() map[string]interface{} {
+    return t.changeMap
 }
