@@ -3,9 +3,9 @@ package repo
 import (
     "context"
 
-    "quants/internal/domain.model/entity"
+    "quants/api/http/dto"
 
-    "quants/internal/domain.model/dto"
+    "quants/internal/domain.model/entity"
 )
 
 /**
@@ -19,4 +19,8 @@ type IExampleRepo interface {
     Save(ctx context.Context, entity *entity.Example) error
     Get(ctx context.Context, ID int) (obj *entity.Example, e error)
     FindByName(ctx context.Context, name string) (*entity.Example, error)
+}
+
+type IHealthCheckRepository interface {
+    HealthCheck(ctx context.Context) error
 }

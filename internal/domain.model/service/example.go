@@ -5,11 +5,11 @@ import (
 
     "github.com/jinzhu/copier"
 
-    "quants/internal/port.adapter/repository"
+    "quants/api/http/dto"
 
+    "quants/internal/port.adapter/repository"
     "quants/util/logger"
 
-    "quants/internal/domain.model/dto"
     "quants/internal/domain.model/repo"
 )
 
@@ -23,10 +23,6 @@ type ExampleService struct {
 }
 
 func NewExampleService(ctx context.Context) *ExampleService {
-    repository.Init(
-        repository.WithMySQL(ctx),
-        repository.WithRedis(ctx),
-    )
     srv := &ExampleService{Repository: repository.Example}
     logger.Log.Info(ctx, "example service init successfully")
     return srv

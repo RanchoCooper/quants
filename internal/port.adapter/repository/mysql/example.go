@@ -4,7 +4,7 @@ import (
     "context"
     "errors"
 
-    "quants/internal/domain.model/dto"
+    "quants/api/http/dto"
     "quants/internal/domain.model/entity"
     "quants/internal/domain.model/repo"
 )
@@ -14,10 +14,8 @@ import (
  * @date 2021/12/24
  */
 
-func GetExampleInstance(mysql IMySQL) *Example {
-    return &Example{
-        IMySQL: mysql,
-    }
+func NewExample(mysql IMySQL) *Example {
+    return &Example{IMySQL: mysql}
 }
 
 type Example struct {

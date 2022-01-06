@@ -5,7 +5,7 @@ import (
 
     "github.com/stretchr/testify/assert"
 
-    "quants/internal/domain.model/dto"
+    "quants/api/http/dto"
 )
 
 /**

@@ -1,5 +1,14 @@
-app: "quants"
-env: "testing"
+app:
+  name: "quants"
+  version: "v0.1.0"
+  debug: true
+http_server:
+  addr: ":3000"
+  pprof: false
+  default_page_size: 10
+  max_page_size: 100
+  read_timeout: "60s"
+  write_timeout: "60s"
 binance:
   key: ""
   secret: ""

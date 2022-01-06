@@ -17,6 +17,21 @@ const (
     privateConfigFilePath = "/config.private.yaml"
 )
 
+type appConfig struct {
+    Name    string `yaml:"name"`
+    Version string `yaml:"version"`
+    Debug   bool   `yaml:"debug"`
+}
+
+type httpServerConfig struct {
+    Addr            string `yaml:"addr"`
+    Pprof           bool   `yaml:"pprof"`
+    DefaultPageSize int    `yaml:"default_page_size"`
+    MaxPageSize     int    `yaml:"max_page_size"`
+    ReadTimeout     string `yaml:"read_timeout"`
+    WriteTimeout    string `yaml:"write_timeout"`
+}
+
 type binanceConfig struct {
     Key    string `yaml:"key"`
     Secret string `yaml:"secret"`
@@ -57,13 +72,13 @@ type redisConfig struct {
 }
 
 type config struct {
-    app      string          `yaml:"app"`
-    Env      string          `yaml:"env"`
-    Log      *logConfig      `yaml:"log"`
-    Binance  *binanceConfig  `yaml:"binance"`
-    DingDing *dingDingConfig `yaml:"dingding"`
-    MySQL    *mysqlConfig    `yaml:"mysql"`
-    Redis    *redisConfig    `yaml:"redis"`
+    App        *appConfig        `yaml:"app"`
+    HTTPServer *httpServerConfig `yaml:"http_server"`
+    Log        *logConfig        `yaml:"log"`
+    Binance    *binanceConfig    `yaml:"binance"`
+    DingDing   *dingDingConfig   `yaml:"dingding"`
+    MySQL      *mysqlConfig      `yaml:"mysql"`
+    Redis      *redisConfig      `yaml:"redis"`
 }
 
 var Config = &config{}
