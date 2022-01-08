@@ -23,24 +23,10 @@ import (
  * @date 2021/12/1
  */
 
-type IBinanceAPI interface {
-    Ping() string
-    GetTickerPrice(string) []byte
-    GetTicker24Hour(string) []byte
-    GetTickerKLine(string, string, int64, int64) []byte
-    TradeLimit(string, string, *float64, *float64) []byte
+type BinanceClient struct {
 }
 
-type binanceAPI struct {
-}
-
-var BinanceClient IBinanceAPI = &binanceAPI{}
-
-func NewBinanceAPI() *binanceAPI {
-    return &binanceAPI{}
-}
-
-func (b *binanceAPI) Ping() string {
+func (b *BinanceClient) Ping() string {
     resp, err := http.Get(fmt.Sprintf("%s/ping", BinanceAPIV3Url))
     if err != nil {
         logger.Log.Errorf(context.Background(), "BinanceAPIV3Url GET /ping err: %v", err)
@@ -54,7 +40,7 @@ func (b *binanceAPI) Ping() string {
     return string(body)
 }
 
-func (b *binanceAPI) GetTickerPrice(symbol string) []byte {
+func (b *BinanceClient) GetTickerPrice(symbol string) []byte {
     client := &http.Client{}
     req, _ := http.NewRequest(http.MethodGet, fmt.Sprintf("%s/ticker/price", BinanceAPIV3Url), nil)
 
@@ -78,7 +64,7 @@ func (b *binanceAPI) GetTickerPrice(symbol string) []byte {
     return body
 }
 
-func (b *binanceAPI) GetTicker24Hour(symbol string) []byte {
+func (b *BinanceClient) GetTicker24Hour(symbol string) []byte {
     client := &http.Client{}
     req, _ := http.NewRequest(http.MethodGet, fmt.Sprintf("%s/ticker/24hr", BinanceAPIV3Url), nil)
 
@@ -102,7 +88,7 @@ func (b *binanceAPI) GetTicker24Hour(symbol string) []byte {
     return body
 }
 
-func (b *binanceAPI) GetTickerKLine(symbol string, interval string, startTime, endTime int64) []byte {
+func (b *BinanceClient) GetTickerKLine(symbol string, interval string, startTime, endTime int64) []byte {
     client := &http.Client{}
     req, _ := http.NewRequest(http.MethodGet, fmt.Sprintf("%s/klines", BinanceAPIV3Url), nil)
 
@@ -130,7 +116,7 @@ func (b *binanceAPI) GetTickerKLine(symbol string, interval string, startTime, e
     return body
 }
 
-func (b *binanceAPI) signature(params *url.Values) *url.Values {
+func (b *BinanceClient) signature(params *url.Values) *url.Values {
     params.Add("timestamp", cast.ToString(time.Now().Unix()))
     params.Add("recvWindow", cast.ToString(5000))
 
@@ -142,7 +128,7 @@ func (b *binanceAPI) signature(params *url.Values) *url.Values {
     return params
 }
 
-func (b *binanceAPI) TradeLimit(symbol, side string, quantity, price *float64) []byte {
+func (b *BinanceClient) TradeLimit(symbol, side string, quantity, price *float64) []byte {
     client := &http.Client{}
     req, _ := http.NewRequest(http.MethodPost, fmt.Sprintf("%s/order", BinanceAPIV3Url), nil)
 
