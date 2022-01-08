@@ -28,8 +28,8 @@ func initConfig() {
 
 func initRuntime(ctx context.Context) {
     repository.Init(
-        repository.WithMySQL(ctx),
-        repository.WithRedis(ctx),
+        repository.WithMySQL(),
+        repository.WithRedis(),
     )
     service.Init(ctx)
 }
