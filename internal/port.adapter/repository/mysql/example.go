@@ -4,9 +4,12 @@ import (
     "context"
     "errors"
 
-    "quants/api/http/dto"
+    "github.com/jinzhu/copier"
+
     "quants/internal/domain.model/entity"
     "quants/internal/domain.model/repo"
+
+    "quants/api/http/dto"
 )
 
 /**
@@ -28,7 +31,8 @@ func (e *Example) Create(ctx context.Context, dto dto.CreateExampleReq) (*entity
     record := &entity.Example{}
     record.Name = dto.Name
     record.Alias = dto.Alias
-    err := e.GetDB(ctx).Create(record).Error
+    _ = copier.Copy(record, dto)
+    err := e.GetDB(ctx).Table(record.TableName()).Create(record).Error
     if err != nil {
         return nil, err
     }
@@ -36,32 +40,35 @@ func (e *Example) Create(ctx context.Context, dto dto.CreateExampleReq) (*entity
     return record, nil
 }
 
-func (e *Example) Delete(ctx context.Context, ID int) error {
-    if ID == 0 {
-        return errors.New("delete fail. need ID")
+func (e *Example) Delete(ctx context.Context, id int) error {
+    if id == 0 {
+        return errors.New("delete fail. need Id")
     }
-    err := e.GetDB(ctx).Delete(&entity.Example{}, ID).Error
+    example := &entity.Example{}
+    err := e.GetDB(ctx).Table(example.TableName()).Delete(example, id).Error
+    // hard delete with .Unscoped()
+    // err := e.GetDB(ctx).Table(example.TableName()).Unscoped().Delete(example, Id).Error
     return err
 }
 
-func (e *Example) Get(ctx context.Context, ID int) (*entity.Example, error) {
-    var record *entity.Example
-    if ID == 0 {
-        return nil, errors.New("get fail. need ID")
+func (e *Example) Get(ctx context.Context, id int) (*entity.Example, error) {
+    record := &entity.Example{}
+    if id == 0 {
+        return nil, errors.New("get fail. need Id")
     }
-    err := e.GetDB(ctx).Find(record, ID).Error
+    err := e.GetDB(ctx).Table(record.TableName()).Find(record, id).Error
     return record, err
 }
 
 func (e *Example) FindByName(ctx context.Context, name string) (*entity.Example, error) {
-    var record *entity.Example
+    record := &entity.Example{}
     if name == "" {
         return nil, errors.New("FindByName fail. need name")
     }
-    err := e.GetDB(ctx).Where("name = ?", name).Last(record).Error
+    err := e.GetDB(ctx).Table(record.TableName()).Where("name = ?", name).Last(record).Error
     return record, err
 }
 
 func (e *Example) Save(ctx context.Context, example *entity.Example) error {
-    return e.GetDB(ctx).Table(example.TableName()).Updates(example.GetChangeMap()).Error
+    return e.GetDB(ctx).Table(example.TableName()).Where("id = ? AND deleted_at IS NULL", example.Id).Updates(example.ChangeMap).Error
 }

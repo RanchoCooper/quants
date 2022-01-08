@@ -32,7 +32,7 @@ func (c *client) close(ctx context.Context) {
 
 type Option func(*client)
 
-func WithMySQL(ctx context.Context) Option {
+func WithMySQL() Option {
     return func(c *client) {
         if c.MySQL == nil {
             if config.Config.MySQL != nil {
@@ -48,7 +48,7 @@ func WithMySQL(ctx context.Context) Option {
     }
 }
 
-func WithRedis(ctx context.Context) Option {
+func WithRedis() Option {
     return func(c *client) {
         if c.Redis == nil {
             if config.Config.Redis != nil {
