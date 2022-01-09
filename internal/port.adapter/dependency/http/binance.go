@@ -23,10 +23,14 @@ import (
  * @date 2021/12/1
  */
 
-type BinanceClient struct {
+type binanceAPI struct {
 }
 
-func (b *BinanceClient) Ping() string {
+func NewBinanceAPI() *binanceAPI {
+    return new(binanceAPI)
+}
+
+func (b *binanceAPI) Ping() string {
     resp, err := http.Get(fmt.Sprintf("%s/ping", BinanceAPIV3Url))
     if err != nil {
         logger.Log.Errorf(context.Background(), "BinanceAPIV3Url GET /ping err: %v", err)
@@ -40,7 +44,7 @@ func (b *BinanceClient) Ping() string {
     return string(body)
 }
 
-func (b *BinanceClient) GetTickerPrice(symbol string) []byte {
+func (b *binanceAPI) GetTickerPrice(symbol string) []byte {
     client := &http.Client{}
     req, _ := http.NewRequest(http.MethodGet, fmt.Sprintf("%s/ticker/price", BinanceAPIV3Url), nil)
 
@@ -64,7 +68,7 @@ func (b *BinanceClient) GetTickerPrice(symbol string) []byte {
     return body
 }
 
-func (b *BinanceClient) GetTicker24Hour(symbol string) []byte {
+func (b *binanceAPI) GetTicker24Hour(symbol string) []byte {
     client := &http.Client{}
     req, _ := http.NewRequest(http.MethodGet, fmt.Sprintf("%s/ticker/24hr", BinanceAPIV3Url), nil)
 
@@ -88,7 +92,7 @@ func (b *BinanceClient) GetTicker24Hour(symbol string) []byte {
     return body
 }
 
-func (b *BinanceClient) GetTickerKLine(symbol string, interval string, startTime, endTime int64) []byte {
+func (b *binanceAPI) GetTickerKLine(symbol string, interval string, startTime, endTime int64) []byte {
     client := &http.Client{}
     req, _ := http.NewRequest(http.MethodGet, fmt.Sprintf("%s/klines", BinanceAPIV3Url), nil)
 
@@ -116,7 +120,7 @@ func (b *BinanceClient) GetTickerKLine(symbol string, interval string, startTime
     return body
 }
 
-func (b *BinanceClient) signature(params *url.Values) *url.Values {
+func (b *binanceAPI) signature(params *url.Values) *url.Values {
     params.Add("timestamp", cast.ToString(time.Now().Unix()))
     params.Add("recvWindow", cast.ToString(5000))
 
@@ -128,7 +132,7 @@ func (b *BinanceClient) signature(params *url.Values) *url.Values {
     return params
 }
 
-func (b *BinanceClient) TradeLimit(symbol, side string, quantity, price *float64) []byte {
+func (b *binanceAPI) TradeLimit(symbol, side string, quantity, price *float64) []byte {
     client := &http.Client{}
     req, _ := http.NewRequest(http.MethodPost, fmt.Sprintf("%s/order", BinanceAPIV3Url), nil)
 

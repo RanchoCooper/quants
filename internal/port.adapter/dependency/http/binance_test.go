@@ -13,28 +13,36 @@ import (
  */
 
 func TestPing(t *testing.T) {
-    assert.Equal(t, "{}", BinanceClient.Ping())
+    binance := NewBinanceAPI()
+    assert.Equal(t, "{}", binance.Ping())
 }
 
 func TestGetTickerPrice(t *testing.T) {
-    body := BinanceClient.GetTickerPrice("ETHBTC")
+    binance := NewBinanceAPI()
+    body := binance.GetTickerPrice("ETHBTC")
+    fmt.Println(body)
     assert.NotEmpty(t, body)
 }
 
 func TestGetTicker24Hour(t *testing.T) {
-    body := BinanceClient.GetTicker24Hour("ETHBTC")
+    binance := NewBinanceAPI()
+    body := binance.GetTicker24Hour("ETHBTC")
+    fmt.Println(body)
     assert.NotEmpty(t, body)
 }
 
 func TestGetTickerKLine(t *testing.T) {
-    body := BinanceClient.GetTickerKLine("ETHBTC", "1M", 0, 0)
+    binance := NewBinanceAPI()
+    body := binance.GetTickerKLine("ETHBTC", "1M", 0, 0)
+    fmt.Println(body)
     assert.NotEmpty(t, body)
 }
 
 func TestTradeLimit(t *testing.T) {
+    binance := NewBinanceAPI()
     quantity := 1.0
-    price:= 0.00000001
-    body := BinanceClient.TradeLimit("ETHBTC", "BUY", &quantity, &price)
+    price := 0.00000001
+    body := binance.TradeLimit("ETHBTC", "BUY", &quantity, &price)
     // FIXME
     // {"code":-1021,"msg":"Timestamp for this request is outside of the recvWindow."}
     fmt.Println(string(body))
