@@ -12,7 +12,7 @@ import (
  */
 
 type User struct {
-    ID        int64                  `gorm:"primarykey" structs:",omitempty,underline"`
+    Id        int64                  `json:"id" structs:",omitempty,underline" gorm:"primarykey" `
     UserName  string                 `json:"user_name" structs:",omitempty,underline"`
     UserEmail string                 `json:"user_email" structs:",omitempty,underline"`
     Asset     *float64               `json:"asset" structs:",omitempty,underline"`

@@ -20,7 +20,7 @@ const (
 )
 
 type Trade struct {
-    ID         int64                  `gorm:"primarykey" structs:",omitempty,underline"`
+    Id         int64                  `json:"id" structs:",omitempty,underline" gorm:"primarykey" `
     UserEmail  string                 `json:"user_email" structs:",omitempty,underline"`
     Symbol     string                 `json:"symbol" structs:",omitempty,underline"`
     OrderId    string                 `json:"order_id" structs:",omitempty,underline"`
@@ -30,7 +30,7 @@ type Trade struct {
     IsSimulate bool                   `json:"is_simulate" structs:",omitempty,underline"`
     CreatedAt  time.Time              `json:"created_at" structs:",omitempty,underline"`
     UpdatedAt  time.Time              `json:"updated_at" structs:",omitempty,underline"`
-    DeletedAt  gorm.DeletedAt         `gorm:"index" structs:",omitempty,underline"`
+    DeletedAt  gorm.DeletedAt         `json:"deleted_at" structs:",omitempty,underline" gorm:"index"`
     ChangeMap  map[string]interface{} `json:"-" structs:"-"`
 }
 
