@@ -7,7 +7,7 @@ import (
 
     "github.com/spf13/cast"
 
-    "quants/api"
+    http2 "quants/api/http"
     "quants/config"
     "quants/util/logger"
 )
@@ -21,7 +21,7 @@ func Start(ctx context.Context, errChan chan error, httpCloseCh chan struct{}) {
     // init server
     srv := &http.Server{
         Addr:         config.Config.HTTPServer.Addr,
-        Handler:      api.NewServerRoute(),
+        Handler:      http2.NewServerRoute(),
         ReadTimeout:  cast.ToDuration(config.Config.HTTPServer.ReadTimeout),
         WriteTimeout: cast.ToDuration(config.Config.HTTPServer.WriteTimeout),
     }
