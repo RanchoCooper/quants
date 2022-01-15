@@ -1,15 +1,17 @@
-package handle
+package http
 
 import (
     "github.com/gin-gonic/gin"
+    "github.com/jinzhu/copier"
     "github.com/spf13/cast"
-
-    "quants/internal/domain.model/service"
-    "quants/util/logger"
 
     "quants/api/http/dto"
     "quants/api/http/errcode"
+    "quants/api/http/handle"
     "quants/api/http/validator"
+    "quants/internal/domain/entity"
+    "quants/internal/domain/service"
+    "quants/util/logger"
 )
 
 /**
@@ -18,7 +20,7 @@ import (
  */
 
 func CreateExample(ctx *gin.Context) {
-    response := NewResponse(ctx)
+    response := handle.NewResponse(ctx)
     body := dto.CreateExampleReq{}
 
     valid, errs := validator.BindAndValid(ctx, &body, ctx.ShouldBindJSON)
@@ -28,17 +30,19 @@ func CreateExample(ctx *gin.Context) {
         response.ToErrorResponse(errResp)
         return
     }
-    example, err := service.Service.ExampleService.Create(ctx, body)
+    example := &entity.Example{}
+    copier.Copy(example, body)
+    example, err := service.Service.ExampleService.Create(ctx, example)
     if err != nil {
         logger.Log.Errorf(ctx, "CreateExample failed.%v", err.Error())
-        ctx.Abort()
+        ctx.AbortWithError(errcode.ServerError.Code, errcode.ServerError)
         return
     }
     response.ToResponse(example)
 }
 
 func DeleteExample(ctx *gin.Context) {
-    response := NewResponse(ctx)
+    response := handle.NewResponse(ctx)
     param := dto.DeleteExampleReq{}
 
     valid, errs := validator.BindAndValid(ctx, &param, ctx.ShouldBindUri)
@@ -49,17 +53,17 @@ func DeleteExample(ctx *gin.Context) {
         return
     }
 
-    err := service.Service.ExampleService.Delete(ctx, param)
+    err := service.Service.ExampleService.Delete(ctx, param.Id)
     if err != nil {
         logger.Log.Errorf(ctx, "DeleteExample failed.%v", err.Error())
-        ctx.Abort()
+        ctx.AbortWithError(errcode.ServerError.Code, errcode.ServerError)
         return
     }
     response.ToResponse(gin.H{})
 }
 
 func UpdateExample(ctx *gin.Context) {
-    response := NewResponse(ctx)
+    response := handle.NewResponse(ctx)
     body := dto.UpdateExampleReq{Id: cast.ToUint(ctx.Param("id"))}
 
     valid, errs := validator.BindAndValid(ctx, &body, ctx.ShouldBindJSON)
@@ -69,17 +73,19 @@ func UpdateExample(ctx *gin.Context) {
         response.ToErrorResponse(errResp)
         return
     }
-    err := service.Service.ExampleService.Update(ctx, body)
+    example := &entity.Example{}
+    copier.Copy(example, body)
+    err := service.Service.ExampleService.Update(ctx, example)
     if err != nil {
         logger.Log.Errorf(ctx, "UpdateExample failed.%v", err.Error())
-        ctx.Abort()
+        ctx.AbortWithError(errcode.ServerError.Code, errcode.ServerError)
         return
     }
     response.ToResponse(gin.H{})
 }
 
 func GetExample(ctx *gin.Context) {
-    response := NewResponse(ctx)
+    response := handle.NewResponse(ctx)
     param := dto.GetExampleReq{}
 
     valid, errs := validator.BindAndValid(ctx, &param, ctx.ShouldBindUri)
@@ -92,7 +98,7 @@ func GetExample(ctx *gin.Context) {
     result, err := service.Service.ExampleService.Get(ctx, param.Id)
     if err != nil {
         logger.Log.Errorf(ctx, "GetExample failed.%v", err.Error())
-        ctx.Abort()
+        ctx.AbortWithError(errcode.ServerError.Code, errcode.ServerError)
         return
     }
     response.ToResponse(*result)

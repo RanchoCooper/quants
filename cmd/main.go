@@ -8,8 +8,8 @@ import (
     "syscall"
 
     "quants/config"
-    "quants/internal/domain.model/service"
-    "quants/internal/port.adapter/repository"
+    "quants/internal/adapter/repository"
+    "quants/internal/domain/service"
     "quants/util/logger"
 
     "quants/cmd/http_server"

@@ -4,7 +4,7 @@ import (
     "context"
     "testing"
 
-    "quants/internal/port.adapter/repository"
+    "quants/internal/adapter/repository"
 )
 
 /**

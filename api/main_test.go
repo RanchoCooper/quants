@@ -1,4 +1,4 @@
-package handle
+package http
 
 import (
     "context"
@@ -6,8 +6,8 @@ import (
     "testing"
 
     "quants/config"
-    "quants/internal/domain.model/service"
-    "quants/internal/port.adapter/repository"
+    "quants/internal/adapter/repository"
+    "quants/internal/domain/service"
 )
 
 /**

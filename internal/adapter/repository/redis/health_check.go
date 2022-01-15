@@ -4,7 +4,7 @@ import (
     "context"
     "errors"
 
-    "quants/internal/domain.model/repo"
+    "quants/internal/domain/repo"
 )
 
 /**

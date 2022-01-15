@@ -6,8 +6,8 @@ import (
     "quants/config"
     "quants/util/logger"
 
-    "quants/internal/port.adapter/repository/mysql"
-    "quants/internal/port.adapter/repository/redis"
+    "quants/internal/adapter/repository/mysql"
+    "quants/internal/adapter/repository/redis"
 )
 
 var (
