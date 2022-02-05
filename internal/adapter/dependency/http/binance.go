@@ -5,6 +5,7 @@ import (
     "crypto/hmac"
     "crypto/sha256"
     "encoding/hex"
+    "encoding/json"
     "fmt"
     "io/ioutil"
     "net/http"
@@ -15,6 +16,7 @@ import (
     "github.com/spf13/cast"
 
     "quants/config"
+    "quants/internal/domain/vo"
     "quants/util/logger"
 )
 
@@ -30,18 +32,25 @@ func NewBinanceAPI() *binanceAPI {
     return new(binanceAPI)
 }
 
-func (b *binanceAPI) Ping() string {
+func (b *binanceAPI) Ping() *vo.PingResp {
     resp, err := http.Get(fmt.Sprintf("%s/ping", BinanceAPIV3Url))
     if err != nil {
-        logger.Log.Errorf(context.Background(), "BinanceAPIV3Url GET /ping err: %v", err)
+        logger.Log.Errorf(context.Background(), "BinanceAPIV3 GET /ping err: %v", err)
     }
     defer resp.Body.Close()
     body, err := ioutil.ReadAll(resp.Body)
     if err != nil {
-        logger.Log.Errorf(context.Background(), "read BinanceAPIV3Url body err: %v", err)
+        logger.Log.Errorf(context.Background(), "read BinanceAPIV3 response body err: %v", err)
     }
 
-    return string(body)
+    result := &vo.PingResp{}
+    err = json.Unmarshal(body, result)
+    if err != nil {
+        logger.Log.Errorf(context.Background(), "Unmarshal BinanceAPIV3 response body err: %v", err)
+        return nil
+    }
+
+    return result
 }
 
 func (b *binanceAPI) GetTickerPrice(symbol string) []byte {

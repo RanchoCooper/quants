@@ -5,6 +5,8 @@ import (
     "testing"
 
     "github.com/stretchr/testify/assert"
+
+    "quants/internal/domain/vo"
 )
 
 /**
@@ -14,7 +16,7 @@ import (
 
 func TestPing(t *testing.T) {
     binance := NewBinanceAPI()
-    assert.Equal(t, "{}", binance.Ping())
+    assert.Equal(t, &vo.PingResp{}, binance.Ping())
 }
 
 func TestGetTickerPrice(t *testing.T) {
