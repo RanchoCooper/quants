@@ -14,20 +14,20 @@ import (
 
 /**
  * @author Rancho
- * @date 2022/1/15
+ * @date 2022/2/6
  */
 
-func NewUser(mysql IMySQL) *User {
-    return &User{IMySQL: mysql}
+func NewTrade(mysql IMySQL) *Trade {
+    return &Trade{IMySQL: mysql}
 }
 
-type User struct {
+type Trade struct {
     IMySQL
 }
 
-var _ repo.IUserRepo = &User{}
+var _ repo.ITradeRepo = &Trade{}
 
-func (e *User) Create(ctx context.Context, tx *gorm.DB, user *entity.User) (result *entity.User, err error) {
+func (e *Trade) Create(ctx context.Context, tx *gorm.DB, trade *entity.Trade) (result *entity.Trade, err error) {
     if tx == nil {
         tx = e.GetDB(ctx).Begin()
         defer func() {
@@ -42,15 +42,15 @@ func (e *User) Create(ctx context.Context, tx *gorm.DB, user *entity.User) (resu
             err = errors.WithStack(tx.Commit().Error)
         }()
     }
-    err = tx.Model(user).Create(user).Error
+    err = tx.Model(trade).Create(trade).Error
     if err != nil {
         return nil, err
     }
 
-    return user, nil
+    return trade, nil
 }
 
-func (e *User) Delete(ctx context.Context, tx *gorm.DB, id int) (err error) {
+func (e *Trade) Delete(ctx context.Context, tx *gorm.DB, id int) (err error) {
     if tx == nil {
         tx = e.GetDB(ctx).Begin()
         defer func() {
@@ -68,14 +68,14 @@ func (e *User) Delete(ctx context.Context, tx *gorm.DB, id int) (err error) {
     if id == 0 {
         return errors.New("delete fail. need Id")
     }
-    user := &entity.User{}
-    err = tx.Model(user).Delete(user, id).Error
+    trade := &entity.Trade{}
+    err = tx.Model(trade).Delete(trade, id).Error
     // hard delete with .Unscoped()
-    // err := e.GetDB(ctx).Table(user.TableName()).Unscoped().Delete(user, Id).Error
+    // err := e.GetDB(ctx).Table(trade.TableName()).Unscoped().Delete(trade, Id).Error
     return err
 }
 
-func (e *User) Update(ctx context.Context, tx *gorm.DB, user *entity.User) (err error) {
+func (e *Trade) Update(ctx context.Context, tx *gorm.DB, trade *entity.Trade) (err error) {
     if tx == nil {
         tx = e.GetDB(ctx).Begin()
         defer func() {
@@ -90,13 +90,13 @@ func (e *User) Update(ctx context.Context, tx *gorm.DB, user *entity.User) (err 
             err = errors.WithStack(tx.Commit().Error)
         }()
     }
-    user.ChangeMap = structs.Map(user)
-    user.ChangeMap["updated_at"] = time.Now()
-    return tx.Model(user).Where("id = ? AND deleted_at IS NULL", user.Id).Updates(user.ChangeMap).Error
+    trade.ChangeMap = structs.Map(trade)
+    trade.ChangeMap["updated_at"] = time.Now()
+    return tx.Model(trade).Where("id = ? AND deleted_at IS NULL", trade.Id).Updates(trade.ChangeMap).Error
 }
 
-func (e *User) Get(ctx context.Context, id int) (*entity.User, error) {
-    record := &entity.User{}
+func (e *Trade) Get(ctx context.Context, id int) (*entity.Trade, error) {
+    record := &entity.Trade{}
     if id == 0 {
         return nil, errors.New("get fail. need Id")
     }
@@ -104,11 +104,11 @@ func (e *User) Get(ctx context.Context, id int) (*entity.User, error) {
     return record, err
 }
 
-func (e *User) FindByEmail(ctx context.Context, email string) (*entity.User, error) {
-    record := &entity.User{}
+func (e *Trade) FindByOrderID(ctx context.Context, email string) (*entity.Trade, error) {
+    record := &entity.Trade{}
     if email == "" {
         return nil, errors.New("FindByEmail fail. need name")
     }
-    err := e.GetDB(ctx).Model(record).Where("user_email = ?", email).Last(record).Error
+    err := e.GetDB(ctx).Model(record).Where("trade_email = ?", email).Last(record).Error
     return record, err
 }

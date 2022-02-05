@@ -8,7 +8,6 @@ import (
     "github.com/RanchoCooper/structs"
     "github.com/stretchr/testify/assert"
 
-    "quants/api/http/dto"
     "quants/internal/domain/entity"
 )
 
@@ -44,17 +43,14 @@ func TestExample_Delete(t *testing.T) {
     mock.ExpectBegin()
     mock.ExpectExec("UPDATE `example`").WillReturnResult(sqlmock.NewResult(1, 1))
     mock.ExpectCommit()
-    d := dto.DeleteExampleReq{
-        Id: 1,
-    }
-    err := exampleRepo.Delete(ctx, nil, d.Id)
+    err := exampleRepo.Delete(ctx, nil, 1)
     assert.NoError(t, err)
 
     err = mock.ExpectationsWereMet()
     assert.NoError(t, err)
 }
 
-func TestExample_Save(t *testing.T) {
+func TestExample_Update(t *testing.T) {
     exampleRepo := NewExample(NewMySQLClient())
     DB, mock := exampleRepo.MockClient()
     exampleRepo.SetDB(DB)
@@ -66,7 +62,7 @@ func TestExample_Save(t *testing.T) {
         Name: "random",
     }
     d.ChangeMap = structs.Map(d)
-    err := exampleRepo.Save(ctx, nil, d)
+    err := exampleRepo.Update(ctx, nil, d)
     assert.NoError(t, err)
 
     err = mock.ExpectationsWereMet()

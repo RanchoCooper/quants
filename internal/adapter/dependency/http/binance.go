@@ -69,6 +69,11 @@ func (b *client) Ping(ctx context.Context) *vo.PingResp {
         return nil
     }
 
+    if resp.StatusCode != http.StatusOK {
+        logger.Log.Errorf(ctx, "Ping error with status code: %d, errMsg: %s", resp.StatusCode, string(body))
+        return nil
+    }
+
     result := &vo.PingResp{}
     err = json.Unmarshal(body, result)
     if err != nil {
@@ -101,6 +106,12 @@ func (b *client) GetTickerPrice(ctx context.Context, symbol string) *vo.TickerPr
         logger.Log.Errorf(ctx, "GetTickerPrice error when read body err: %v", err)
         return nil
     }
+
+    if resp.StatusCode != http.StatusOK {
+        logger.Log.Errorf(ctx, "Ping error with status code: %d, errMsg: %s", resp.StatusCode, string(body))
+        return nil
+    }
+
     result := &vo.TickerPrice{}
     err = json.Unmarshal(body, result)
     if err != nil {
@@ -131,6 +142,11 @@ func (b *client) GetTicker24Hour(ctx context.Context, symbol string) *vo.Ticker2
     body, err := ioutil.ReadAll(resp.Body)
     if err != nil {
         logger.Log.Errorf(ctx, "GetTicker24Hour error when read body err: %v", err)
+        return nil
+    }
+
+    if resp.StatusCode != http.StatusOK {
+        logger.Log.Errorf(ctx, "Ping error with status code: %d, errMsg: %s", resp.StatusCode, string(body))
         return nil
     }
 
@@ -172,6 +188,11 @@ func (b *client) GetTickerKLine(ctx context.Context, symbol string, interval str
         return nil
     }
 
+    if resp.StatusCode != http.StatusOK {
+        logger.Log.Errorf(ctx, "Ping error with status code: %d, errMsg: %s", resp.StatusCode, string(body))
+        return nil
+    }
+
     result := &[]vo.KLine{}
     err = json.Unmarshal(body, result)
     if err != nil {
@@ -210,6 +231,11 @@ func (b *client) TradeLimit(ctx context.Context, symbol, side string, quantity, 
     body, err := ioutil.ReadAll(resp.Body)
     if err != nil {
         logger.Log.Errorf(ctx, "TradeLimit error when read body err: %v", err)
+        return nil
+    }
+
+    if resp.StatusCode != http.StatusOK {
+        logger.Log.Errorf(ctx, "Ping error with status code: %d, errMsg: %s", resp.StatusCode, string(body))
         return nil
     }
 
