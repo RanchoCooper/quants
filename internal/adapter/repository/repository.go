@@ -15,6 +15,7 @@ var (
     HealthCheck *redis.HealthCheck
     Example     *mysql.Example
     User        *mysql.User
+    Trade       *mysql.Trade
 )
 
 type client struct {
@@ -48,6 +49,9 @@ func WithMySQL() Option {
         }
         if User == nil {
             User = mysql.NewUser(Clients.MySQL)
+        }
+        if Trade == nil {
+            Trade = mysql.NewTrade(Clients.MySQL)
         }
     }
 }
