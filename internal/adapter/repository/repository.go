@@ -12,8 +12,9 @@ import (
 
 var (
     Clients     = &client{}
-    Example     *mysql.Example
     HealthCheck *redis.HealthCheck
+    Example     *mysql.Example
+    User        *mysql.User
 )
 
 type client struct {
@@ -44,6 +45,9 @@ func WithMySQL() Option {
         // inject repository
         if Example == nil {
             Example = mysql.NewExample(Clients.MySQL)
+        }
+        if User == nil {
+            User = mysql.NewUser(Clients.MySQL)
         }
     }
 }

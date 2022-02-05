@@ -13,10 +13,12 @@ import (
 var (
     once       sync.Once
     ExampleSvc *ExampleService
+    UserSvc    *UserService
 )
 
 func Init(ctx context.Context) {
     once.Do(func() {
         ExampleSvc = NewExampleService(ctx)
+        UserSvc = NewUserService(ctx)
     })
 }
