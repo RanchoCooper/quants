@@ -59,20 +59,20 @@ func (b *client) signature(params *url.Values) *url.Values {
 func (b *client) Ping(ctx context.Context) *vo.PingResp {
     resp, err := http.Get(fmt.Sprintf("%s/ping", BinanceAPIV3Url))
     if err != nil {
-        logger.Log.Errorf(ctx, "Binance API GET /ping err: %v", err)
+        logger.Log.Errorf(ctx, "Ping err: %v", err)
         return nil
     }
     defer resp.Body.Close()
     body, err := ioutil.ReadAll(resp.Body)
     if err != nil {
-        logger.Log.Errorf(ctx, "read Binance API response body err: %v", err)
+        logger.Log.Errorf(ctx, "Ping error when read response body err: %v", err)
         return nil
     }
 
     result := &vo.PingResp{}
     err = json.Unmarshal(body, result)
     if err != nil {
-        logger.Log.Errorf(ctx, "Unmarshal Binance API response body err: %v", err)
+        logger.Log.Errorf(ctx, "Ping error when Unmarshal response body err: %v", err)
         return nil
     }
 
@@ -91,20 +91,20 @@ func (b *client) GetTickerPrice(ctx context.Context, symbol string) *vo.TickerPr
 
     resp, err := client.Do(req)
     if err != nil {
-        logger.Log.Errorf(ctx, "Binance API GET /ticker/price err: %v", err)
+        logger.Log.Errorf(ctx, "GetTickerPrice err: %v", err)
         return nil
     }
     defer resp.Body.Close()
 
     body, err := ioutil.ReadAll(resp.Body)
     if err != nil {
-        logger.Log.Errorf(ctx, "read Binance API body err: %v", err)
+        logger.Log.Errorf(ctx, "GetTickerPrice error when read body err: %v", err)
         return nil
     }
     result := &vo.TickerPrice{}
     err = json.Unmarshal(body, result)
     if err != nil {
-        logger.Log.Errorf(ctx, "Unmarshal Binance API response body err: %v", err)
+        logger.Log.Errorf(ctx, "GetTickerPrice error when Unmarshal response body err: %v", err)
         return nil
     }
 
@@ -123,28 +123,28 @@ func (b *client) GetTicker24Hour(ctx context.Context, symbol string) *vo.Ticker2
 
     resp, err := client.Do(req)
     if err != nil {
-        logger.Log.Errorf(ctx, "Binance API GET /ticker/24hr err: %v", err)
+        logger.Log.Errorf(ctx, "GetTicker24Hour err: %v", err)
         return nil
     }
     defer resp.Body.Close()
 
     body, err := ioutil.ReadAll(resp.Body)
     if err != nil {
-        logger.Log.Errorf(ctx, "read Binance API body err: %v", err)
+        logger.Log.Errorf(ctx, "GetTicker24Hour error when read body err: %v", err)
         return nil
     }
 
     result := &vo.Ticker24Hour{}
     err = json.Unmarshal(body, result)
     if err != nil {
-        logger.Log.Errorf(ctx, "Unmarshal Binance API response body err: %v", err)
+        logger.Log.Errorf(ctx, "GetTicker24Hour error when Unmarshal response body err: %v", err)
         return nil
     }
 
     return result
 }
 
-func (b *client) GetTickerKLine(ctx context.Context, symbol string, interval string, startTime, endTime int64) []byte {
+func (b *client) GetTickerKLine(ctx context.Context, symbol string, interval string, startTime, endTime int64) *[]vo.KLine {
     // TODO
     client := &http.Client{}
     req, _ := http.NewRequest(http.MethodGet, fmt.Sprintf("%s/klines", BinanceAPIV3Url), nil)
@@ -161,18 +161,25 @@ func (b *client) GetTickerKLine(ctx context.Context, symbol string, interval str
 
     resp, err := client.Do(req)
     if err != nil {
-        logger.Log.Errorf(ctx, "Binance API GET /klines err: %v", err)
+        logger.Log.Errorf(ctx, "GetTickerKLine err: %v", err)
         return nil
     }
     defer resp.Body.Close()
 
     body, err := ioutil.ReadAll(resp.Body)
     if err != nil {
-        logger.Log.Errorf(ctx, "read Binance API body err: %v", err)
+        logger.Log.Errorf(ctx, "GetTickerKLine error when read body err: %v", err)
         return nil
     }
 
-    return body
+    result := &[]vo.KLine{}
+    err = json.Unmarshal(body, result)
+    if err != nil {
+        logger.Log.Errorf(ctx, "GetTickerKLine error when Unmarshal response body err: %v", err)
+        return nil
+    }
+
+    return result
 }
 
 func (b *client) TradeLimit(ctx context.Context, symbol, side string, quantity, price *float64) *vo.TradeResult {
@@ -195,26 +202,26 @@ func (b *client) TradeLimit(ctx context.Context, symbol, side string, quantity, 
 
     resp, err := client.Do(req)
     if err != nil {
-        logger.Log.Errorf(ctx, "Binance API POST /order err: %v", err)
+        logger.Log.Errorf(ctx, "TradeLimit err: %v", err)
         return nil
     }
     defer resp.Body.Close()
 
     body, err := ioutil.ReadAll(resp.Body)
     if err != nil {
-        logger.Log.Errorf(ctx, "read Binance API body err: %v", err)
+        logger.Log.Errorf(ctx, "TradeLimit error when read body err: %v", err)
         return nil
     }
 
     if resp.StatusCode != http.StatusOK {
-        logger.Log.Errorf(ctx, "Binance API POST /order with status code: %d, errMsg: %s", resp.StatusCode, string(body))
+        logger.Log.Errorf(ctx, "TradeLimit error with status code: %d, errMsg: %s", resp.StatusCode, string(body))
         return nil
     }
 
     result := &vo.TradeResult{}
     err = json.Unmarshal(body, result)
     if err != nil {
-        logger.Log.Errorf(ctx, "Unmarshal Binance API response body err: %v", err)
+        logger.Log.Errorf(ctx, "TradeLimit error when Unmarshal response body err: %v", err)
         return nil
     }
 

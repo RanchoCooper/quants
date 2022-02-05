@@ -1,5 +1,11 @@
 package vo
 
+import (
+    "encoding/json"
+
+    "github.com/spf13/cast"
+)
+
 /**
  * @author Rancho
  * @date 2022/1/16
@@ -32,6 +38,25 @@ type KLine struct {
     Low            float64
     Volume         float64
     NumberOfTrades int64
+}
+
+func (kl *KLine) UnmarshalJSON(b []byte) error {
+    var content []interface{}
+    err := json.Unmarshal(b, &content)
+    if err != nil {
+        return err
+    }
+
+    kl.OpenTime = cast.ToInt64(content[0])
+    kl.Open = cast.ToFloat64(content[1])
+    kl.High = cast.ToFloat64(content[2])
+    kl.Low = cast.ToFloat64(content[3])
+    kl.Close = cast.ToFloat64(content[4])
+    kl.Volume = cast.ToFloat64(content[5])
+    kl.CloseTime = cast.ToInt64(content[6])
+    kl.NumberOfTrades = cast.ToInt64(content[8])
+
+    return nil
 }
 
 type TradeResult struct {
