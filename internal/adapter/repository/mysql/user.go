@@ -2,6 +2,7 @@ package mysql
 
 import (
     "context"
+    "time"
 
     "github.com/RanchoCooper/structs"
     "github.com/pkg/errors"
@@ -41,7 +42,7 @@ func (e *User) Create(ctx context.Context, tx *gorm.DB, user *entity.User) (resu
             err = errors.WithStack(tx.Commit().Error)
         }()
     }
-    err = tx.Table(user.TableName()).Create(user).Error
+    err = tx.Model(user).Create(user).Error
     if err != nil {
         return nil, err
     }
@@ -68,7 +69,7 @@ func (e *User) Delete(ctx context.Context, tx *gorm.DB, id int) (err error) {
         return errors.New("delete fail. need Id")
     }
     user := &entity.User{}
-    err = tx.Table(user.TableName()).Delete(user, id).Error
+    err = tx.Model(user).Delete(user, id).Error
     // hard delete with .Unscoped()
     // err := e.GetDB(ctx).Table(user.TableName()).Unscoped().Delete(user, Id).Error
     return err
@@ -90,7 +91,8 @@ func (e *User) Update(ctx context.Context, tx *gorm.DB, user *entity.User) (err 
         }()
     }
     user.ChangeMap = structs.Map(user)
-    return tx.Table(user.TableName()).Where("id = ? AND deleted_at IS NULL", user.Id).Updates(user.ChangeMap).Error
+    user.ChangeMap["updated_at"] = time.Now()
+    return tx.Model(user).Where("id = ? AND deleted_at IS NULL", user.Id).Updates(user.ChangeMap).Error
 }
 
 func (e *User) Get(ctx context.Context, id int) (*entity.User, error) {
@@ -98,7 +100,7 @@ func (e *User) Get(ctx context.Context, id int) (*entity.User, error) {
     if id == 0 {
         return nil, errors.New("get fail. need Id")
     }
-    err := e.GetDB(ctx).Table(record.TableName()).Find(record, id).Error
+    err := e.GetDB(ctx).Model(record).Find(record, id).Error
     return record, err
 }
 
@@ -107,6 +109,6 @@ func (e *User) FindByEmail(ctx context.Context, email string) (*entity.User, err
     if email == "" {
         return nil, errors.New("FindByEmail fail. need name")
     }
-    err := e.GetDB(ctx).Table(record.TableName()).Where("user_email = ?", email).Last(record).Error
+    err := e.GetDB(ctx).Model(record).Where("user_email = ?", email).Last(record).Error
     return record, err
 }

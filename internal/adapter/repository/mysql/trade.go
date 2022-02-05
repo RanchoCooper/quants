@@ -2,6 +2,7 @@ package mysql
 
 import (
     "context"
+    "time"
 
     "github.com/RanchoCooper/structs"
     "github.com/pkg/errors"
@@ -41,7 +42,7 @@ func (e *Trade) Create(ctx context.Context, tx *gorm.DB, trade *entity.Trade) (r
             err = errors.WithStack(tx.Commit().Error)
         }()
     }
-    err = tx.Table(trade.TableName()).Create(trade).Error
+    err = tx.Model(trade).Create(trade).Error
     if err != nil {
         return nil, err
     }
@@ -68,7 +69,7 @@ func (e *Trade) Delete(ctx context.Context, tx *gorm.DB, id int) (err error) {
         return errors.New("delete fail. need Id")
     }
     trade := &entity.Trade{}
-    err = tx.Table(trade.TableName()).Delete(trade, id).Error
+    err = tx.Model(trade).Delete(trade, id).Error
     // hard delete with .Unscoped()
     // err := e.GetDB(ctx).Table(trade.TableName()).Unscoped().Delete(trade, Id).Error
     return err
@@ -90,7 +91,8 @@ func (e *Trade) Update(ctx context.Context, tx *gorm.DB, trade *entity.Trade) (e
         }()
     }
     trade.ChangeMap = structs.Map(trade)
-    return tx.Table(trade.TableName()).Where("id = ? AND deleted_at IS NULL", trade.Id).Updates(trade.ChangeMap).Error
+    trade.ChangeMap["updated_at"] = time.Now()
+    return tx.Model(trade).Where("id = ? AND deleted_at IS NULL", trade.Id).Updates(trade.ChangeMap).Error
 }
 
 func (e *Trade) Get(ctx context.Context, id int) (*entity.Trade, error) {
@@ -98,7 +100,7 @@ func (e *Trade) Get(ctx context.Context, id int) (*entity.Trade, error) {
     if id == 0 {
         return nil, errors.New("get fail. need Id")
     }
-    err := e.GetDB(ctx).Table(record.TableName()).Find(record, id).Error
+    err := e.GetDB(ctx).Model(record).Find(record, id).Error
     return record, err
 }
 
@@ -107,6 +109,6 @@ func (e *Trade) FindByOrderID(ctx context.Context, email string) (*entity.Trade,
     if email == "" {
         return nil, errors.New("FindByEmail fail. need name")
     }
-    err := e.GetDB(ctx).Table(record.TableName()).Where("trade_email = ?", email).Last(record).Error
+    err := e.GetDB(ctx).Model(record).Where("trade_email = ?", email).Last(record).Error
     return record, err
 }
