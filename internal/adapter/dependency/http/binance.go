@@ -233,7 +233,7 @@ func (b *client) TradeLimit(ctx context.Context, symbol, side string, quantity, 
         logger.Log.Errorf(ctx, "TradeLimit error when read body err: %v", err)
         return nil
     }
-   
+
     if resp.StatusCode != http.StatusOK {
         logger.Log.Errorf(ctx, "Ping error with status code: %d, errMsg: %s", resp.StatusCode, string(body))
         return nil

@@ -74,7 +74,7 @@ func (e *Example) Delete(ctx context.Context, tx *gorm.DB, id int) (err error) {
     return err
 }
 
-func (e *Example) Save(ctx context.Context, tx *gorm.DB, example *entity.Example) (err error) {
+func (e *Example) Update(ctx context.Context, tx *gorm.DB, example *entity.Example) (err error) {
     if tx == nil {
         tx = e.GetDB(ctx).Begin()
         defer func() {

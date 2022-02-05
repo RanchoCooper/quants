@@ -31,7 +31,7 @@ type Trade struct {
     CreatedAt  time.Time              `json:"created_at" structs:",omitempty,underline"`
     UpdatedAt  time.Time              `json:"updated_at" structs:",omitempty,underline"`
     DeletedAt  gorm.DeletedAt         `json:"deleted_at" structs:",omitempty,underline" gorm:"index"`
-    ChangeMap  map[string]interface{} `json:"-" structs:"-"`
+    ChangeMap  map[string]interface{} `json:"-" structs:"-" gorm:"-"`
 }
 
 func (Trade) TableName() string {
