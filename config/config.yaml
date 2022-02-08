@@ -1,3 +1,4 @@
+env: github
 app:
   name: "quants"
   version: "v0.1.0"

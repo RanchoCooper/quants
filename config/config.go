@@ -72,6 +72,7 @@ type redisConfig struct {
 }
 
 type config struct {
+    Env        string            `yaml:"env"`
     App        *appConfig        `yaml:"app"`
     HTTPServer *httpServerConfig `yaml:"http_server"`
     Log        *logConfig        `yaml:"log"`
