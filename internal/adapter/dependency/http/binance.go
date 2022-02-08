@@ -160,7 +160,7 @@ func (b *client) GetTicker24Hour(ctx context.Context, symbol string) *vo.Ticker2
     return result
 }
 
-func (b *client) GetTickerKLine(ctx context.Context, symbol string, interval string, startTime, endTime int64) *[]vo.KLine {
+func (b *client) GetTickerKLine(ctx context.Context, symbol string, interval string, limit int, startTime, endTime int64) *[]vo.KLine {
     // TODO
     client := &http.Client{}
     req, _ := http.NewRequest(http.MethodGet, fmt.Sprintf("%s/klines", BinanceAPIV3Url), nil)
@@ -168,6 +168,7 @@ func (b *client) GetTickerKLine(ctx context.Context, symbol string, interval str
     query := req.URL.Query()
     query.Add("symbol", symbol)
     query.Add("interval", interval)
+    query.Add("limit", cast.ToString(limit))
 
     if startTime != 0 && endTime != 0 {
         query.Add("startTime", strconv.FormatInt(startTime, 10))
