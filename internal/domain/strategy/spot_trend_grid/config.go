@@ -6,6 +6,8 @@ import (
     "io/ioutil"
     "os"
 
+    "github.com/oleiade/reflections"
+
     "quants/internal/adapter/dependency/http"
     "quants/util/logger"
 )
@@ -64,60 +66,39 @@ func (c *Config) GetCoinList() []string {
 
 func (c *Config) GetBuyPrice(symbol string) float64 {
     c.ReadFromFile()
-    switch symbol {
-    case "ETHUSDT":
-        return c.ETHUSDT.RunBet.NextBuyPrice
-    case "BTCUSDT":
-        return c.BTCUSDT.RunBet.NextBuyPrice
-    case "BNBUSDT":
-        return c.BNBUSDT.RunBet.NextBuyPrice
-    default:
+    value, err := reflections.GetField(c, symbol)
+    if err != nil {
         return 0.0
     }
+    return value.(CoinConfig).RunBet.NextBuyPrice
 }
 
 func (c *Config) GetSellPrice(symbol string) float64 {
     c.ReadFromFile()
-    switch symbol {
-    case "ETHUSDT":
-        return c.ETHUSDT.RunBet.GridSellPrice
-    case "BTCUSDT":
-        return c.BTCUSDT.RunBet.GridSellPrice
-    case "BNBUSDT":
-        return c.BNBUSDT.RunBet.GridSellPrice
-    default:
+    value, err := reflections.GetField(c, symbol)
+    if err != nil {
         return 0.0
     }
+    return value.(CoinConfig).RunBet.GridSellPrice
 }
 
 func (c *Config) GetCoinType(symbol string) string {
     c.ReadFromFile()
-    switch symbol {
-    case "ETHUSDT":
-        return c.ETHUSDT.Config.Cointype
-    case "BTCUSDT":
-        return c.BTCUSDT.Config.Cointype
-    case "BNBUSDT":
-        return c.BNBUSDT.Config.Cointype
-    default:
+    value, err := reflections.GetField(c, symbol)
+    if err != nil {
         return ""
     }
-
+    return value.(CoinConfig).Config.Cointype
 }
 
 func (c *Config) GetRecordPrice(symbol string) float64 {
     c.ReadFromFile()
     step := c.GetStep(symbol) - 1
-    switch symbol {
-    case "ETHUSDT":
-        return c.ETHUSDT.RunBet.RecordedPrice[step]
-    case "BTCUSDT":
-        return c.BTCUSDT.RunBet.RecordedPrice[step]
-    case "BNBUSDT":
-        return c.BNBUSDT.RunBet.RecordedPrice[step]
-    default:
+    value, err := reflections.GetField(c, symbol)
+    if err != nil {
         return 0.0
     }
+    return value.(CoinConfig).RunBet.RecordedPrice[step]
 }
 
 // GetQuantity true 为买入，false为卖出
@@ -130,16 +111,11 @@ func (c *Config) GetQuantity(symbol string, exchangeMethod bool) float64 {
     quantity := 0.0
     var quantities []float64
 
-    switch symbol {
-    case "ETHUSDT":
-        quantities = c.ETHUSDT.Config.Quantity
-    case "BTCUSDT":
-        quantities = c.BTCUSDT.Config.Quantity
-    case "BNBUSDT":
-        quantities = c.BNBUSDT.Config.Quantity
-    default:
-        quantities = []float64{0.0}
+    value, err := reflections.GetField(c, symbol)
+    if err != nil {
+        return 0.0
     }
+    quantities = value.(CoinConfig).Config.Quantity
 
     if step < len(quantities) {
         if step == 0 {
@@ -156,46 +132,31 @@ func (c *Config) GetQuantity(symbol string, exchangeMethod bool) float64 {
 
 func (c *Config) GetStep(symbol string) int {
     c.ReadFromFile()
-    switch symbol {
-    case "ETHUSDT":
-        return c.ETHUSDT.RunBet.Step
-    case "BTCUSDT":
-        return c.BTCUSDT.RunBet.Step
-    case "BNBUSDT":
-        return c.BNBUSDT.RunBet.Step
-    default:
-        return 0.0
+    value, err := reflections.GetField(c, symbol)
+    if err != nil {
+        return 0
     }
+    return value.(CoinConfig).RunBet.Step
 }
 
 // GetProfitRatio 补仓比率
 func (c *Config) GetProfitRatio(symbol string) float64 {
     c.ReadFromFile()
-    switch symbol {
-    case "ETHUSDT":
-        return c.ETHUSDT.Config.ProfitRatio
-    case "BTCUSDT":
-        return c.BTCUSDT.Config.ProfitRatio
-    case "BNBUSDT":
-        return c.BNBUSDT.Config.ProfitRatio
-    default:
+    value, err := reflections.GetField(c, symbol)
+    if err != nil {
         return 0.0
     }
+    return value.(CoinConfig).Config.ProfitRatio
 }
 
 // GetDoubleThrowRatio 止盈比率
 func (c *Config) GetDoubleThrowRatio(symbol string) float64 {
     c.ReadFromFile()
-    switch symbol {
-    case "ETHUSDT":
-        return c.ETHUSDT.Config.DoubleThrowRatio
-    case "BTCUSDT":
-        return c.BTCUSDT.Config.DoubleThrowRatio
-    case "BNBUSDT":
-        return c.BNBUSDT.Config.DoubleThrowRatio
-    default:
+    value, err := reflections.GetField(c, symbol)
+    if err != nil {
         return 0.0
     }
+    return value.(CoinConfig).Config.DoubleThrowRatio
 }
 
 func (c *Config) GetAtr(symbol string) float64 {

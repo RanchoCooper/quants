@@ -15,7 +15,21 @@ import (
 func TestConfig_ReadFromFile(t *testing.T) {
     c := &Config{}
     err := c.ReadFromFile()
+    fmt.Println(c)
     assert.NoError(t, err)
     assert.NotEmpty(t, c)
-    fmt.Println(c)
+}
+
+func TestConfig_GetBuyPrice(t *testing.T) {
+    t.Run("basic", func(t *testing.T) {
+        c := &Config{}
+        price := c.GetBuyPrice("BNBUSDT")
+        assert.NotEmpty(t, price)
+    })
+
+    t.Run("not exists", func(t *testing.T) {
+        c := &Config{}
+        price := c.GetBuyPrice("not exists")
+        assert.Empty(t, price)
+    })
 }
