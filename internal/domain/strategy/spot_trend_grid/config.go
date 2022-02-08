@@ -242,7 +242,7 @@ func (c *Config) RemoveRecordPrice(symbol string) {
     newCoinConfig.RunBet.RecordedPrice = newCoinConfig.RunBet.RecordedPrice[:size-1]
     err = reflections.SetField(c, symbol, newCoinConfig)
     if err != nil {
-        logger.Log.Errorf(context.Background(), "RemoveRecordPrice fail, err: %v", err)
+        logger.Log.Errorf(context.Background(), "RemoveRecordPrice fail when SetField, err: %v", err)
         return
     }
     c.ModifyJSONData()
@@ -250,43 +250,28 @@ func (c *Config) RemoveRecordPrice(symbol string) {
 
 func (c *Config) ModifyPrice(symbol string, dealPrice float64, step int, marketPrice float64) {
     c.ReadFromFile()
-
-    switch symbol {
-    case "ETHUSDT":
-        c.ETHUSDT.RunBet.NextBuyPrice = dealPrice * (1 - c.ETHUSDT.Config.DoubleThrowRatio/100)
-        c.ETHUSDT.RunBet.GridSellPrice = dealPrice * (1 + c.ETHUSDT.Config.ProfitRatio/100)
-        // 如果修改后的价格满足立刻卖出的条件，则再次更改
-        if c.ETHUSDT.RunBet.NextBuyPrice > marketPrice {
-            c.ETHUSDT.RunBet.NextBuyPrice = marketPrice * (1 - c.ETHUSDT.Config.DoubleThrowRatio/100)
-        } else if c.ETHUSDT.RunBet.GridSellPrice < marketPrice {
-            c.ETHUSDT.RunBet.GridSellPrice = marketPrice * (1 + c.ETHUSDT.Config.ProfitRatio/100)
-        }
-        c.ETHUSDT.RunBet.Step = step
-        logger.Log.Infof(context.Background(), "修改后的补仓价格为: %f，修改后的网格价格为: %f", c.ETHUSDT.RunBet.NextBuyPrice, c.ETHUSDT.RunBet.GridSellPrice)
-    case "BTCUSDT":
-        c.BTCUSDT.RunBet.NextBuyPrice = dealPrice * (1 - c.BTCUSDT.Config.DoubleThrowRatio/100)
-        c.BTCUSDT.RunBet.GridSellPrice = dealPrice * (1 + c.BTCUSDT.Config.ProfitRatio/100)
-        // 如果修改后的价格满足立刻卖出的条件，则再次更改
-        if c.BTCUSDT.RunBet.NextBuyPrice > marketPrice {
-            c.BTCUSDT.RunBet.NextBuyPrice = marketPrice * (1 - c.BTCUSDT.Config.DoubleThrowRatio/100)
-        } else if c.BTCUSDT.RunBet.GridSellPrice < marketPrice {
-            c.BTCUSDT.RunBet.GridSellPrice = marketPrice * (1 + c.BTCUSDT.Config.ProfitRatio/100)
-        }
-        c.BTCUSDT.RunBet.Step = step
-        logger.Log.Infof(context.Background(), "修改后的补仓价格为: %f，修改后的网格价格为: %f", c.BTCUSDT.RunBet.NextBuyPrice, c.BTCUSDT.RunBet.GridSellPrice)
-    case "BNBUSDT":
-        c.BNBUSDT.RunBet.NextBuyPrice = dealPrice * (1 - c.BNBUSDT.Config.DoubleThrowRatio/100)
-        c.BNBUSDT.RunBet.GridSellPrice = dealPrice * (1 + c.BNBUSDT.Config.ProfitRatio/100)
-        // 如果修改后的价格满足立刻卖出的条件，则再次更改
-        if c.BNBUSDT.RunBet.NextBuyPrice > marketPrice {
-            c.BNBUSDT.RunBet.NextBuyPrice = marketPrice * (1 - c.BNBUSDT.Config.DoubleThrowRatio/100)
-        } else if c.BNBUSDT.RunBet.GridSellPrice < marketPrice {
-            c.BNBUSDT.RunBet.GridSellPrice = marketPrice * (1 + c.BNBUSDT.Config.ProfitRatio/100)
-        }
-        c.BNBUSDT.RunBet.Step = step
-        logger.Log.Infof(context.Background(), "修改后的补仓价格为: %f，修改后的网格价格为: %f", c.BNBUSDT.RunBet.NextBuyPrice, c.BNBUSDT.RunBet.GridSellPrice)
-    default:
+    item, err := reflections.GetField(c, symbol)
+    if err != nil {
+        logger.Log.Errorf(context.Background(), "ModifyPrice fail when symbol=%s, err: %v", symbol, err)
+        return
+    }
+    newCoinConfig := CoinConfig{}
+    newCoinConfig = item.(CoinConfig)
+    newCoinConfig.RunBet.NextBuyPrice = dealPrice * (1 - c.ETHUSDT.Config.DoubleThrowRatio/100)
+    newCoinConfig.RunBet.GridSellPrice = dealPrice * (1 + c.ETHUSDT.Config.ProfitRatio/100)
+    // 如果修改后的价格满足立刻卖出的条件，则再次更改
+    if newCoinConfig.RunBet.NextBuyPrice > marketPrice {
+        newCoinConfig.RunBet.NextBuyPrice = marketPrice * (1 - c.ETHUSDT.Config.DoubleThrowRatio/100)
+    } else if newCoinConfig.RunBet.GridSellPrice < marketPrice {
+        newCoinConfig.RunBet.GridSellPrice = marketPrice * (1 + c.ETHUSDT.Config.ProfitRatio/100)
+    }
+    newCoinConfig.RunBet.Step = step
+    err = reflections.SetField(c, symbol, newCoinConfig)
+    if err != nil {
+        logger.Log.Errorf(context.Background(), "ModifyPrice fail when SetField, err: %v", err)
+        return
     }
 
     c.ModifyJSONData()
+    logger.Log.Infof(context.Background(), "修改后的补仓价格为: %f，修改后的网格价格为: %f", c.ETHUSDT.RunBet.NextBuyPrice, c.ETHUSDT.RunBet.GridSellPrice)
 }
