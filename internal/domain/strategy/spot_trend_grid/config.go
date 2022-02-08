@@ -70,6 +70,7 @@ func (c *Config) GetBuyPrice(symbol string) float64 {
     c.ReadFromFile()
     item, err := reflections.GetField(c, symbol)
     if err != nil {
+        logger.Log.Errorf(context.Background(), "GetBuyPrice fail when symbol=%s, err: %v", symbol, err)
         return 0.0
     }
     return item.(CoinConfig).RunBet.NextBuyPrice
@@ -79,6 +80,7 @@ func (c *Config) GetSellPrice(symbol string) float64 {
     c.ReadFromFile()
     item, err := reflections.GetField(c, symbol)
     if err != nil {
+        logger.Log.Errorf(context.Background(), "GetSellPrice fail when symbol=%s, err: %v", symbol, err)
         return 0.0
     }
     return item.(CoinConfig).RunBet.GridSellPrice
@@ -88,6 +90,7 @@ func (c *Config) GetCoinType(symbol string) string {
     c.ReadFromFile()
     item, err := reflections.GetField(c, symbol)
     if err != nil {
+        logger.Log.Errorf(context.Background(), "GetCoinType fail when symbol=%s, err: %v", symbol, err)
         return ""
     }
     return item.(CoinConfig).Config.Cointype
@@ -98,6 +101,7 @@ func (c *Config) GetRecordPrice(symbol string) float64 {
     step := c.GetStep(symbol) - 1
     item, err := reflections.GetField(c, symbol)
     if err != nil {
+        logger.Log.Errorf(context.Background(), "GetRecordPrice fail when symbol=%s, err: %v", symbol, err)
         return 0.0
     }
     return item.(CoinConfig).RunBet.RecordedPrice[step]
@@ -115,6 +119,7 @@ func (c *Config) GetQuantity(symbol string, exchangeMethod bool) float64 {
 
     item, err := reflections.GetField(c, symbol)
     if err != nil {
+        logger.Log.Errorf(context.Background(), "GetQuantity fail when symbol=%s, err: %v", symbol, err)
         return 0.0
     }
     quantities = item.(CoinConfig).Config.Quantity
@@ -136,6 +141,7 @@ func (c *Config) GetStep(symbol string) int {
     c.ReadFromFile()
     item, err := reflections.GetField(c, symbol)
     if err != nil {
+        logger.Log.Errorf(context.Background(), "GetStep fail when symbol=%s, err: %v", symbol, err)
         return 0
     }
     return item.(CoinConfig).RunBet.Step
@@ -146,6 +152,7 @@ func (c *Config) GetProfitRatio(symbol string) float64 {
     c.ReadFromFile()
     item, err := reflections.GetField(c, symbol)
     if err != nil {
+        logger.Log.Errorf(context.Background(), "GetProfitRatio fail when symbol=%s, err: %v", symbol, err)
         return 0.0
     }
     return item.(CoinConfig).Config.ProfitRatio
@@ -156,6 +163,7 @@ func (c *Config) GetDoubleThrowRatio(symbol string) float64 {
     c.ReadFromFile()
     item, err := reflections.GetField(c, symbol)
     if err != nil {
+        logger.Log.Errorf(context.Background(), "GetDoubleThrowRatio fail when symbol=%s, err: %v", symbol, err)
         return 0.0
     }
     return item.(CoinConfig).Config.DoubleThrowRatio
@@ -179,6 +187,7 @@ func (c *Config) SetRatio(symbol string) {
     atr := c.GetAtr(symbol)
     item, err := reflections.GetField(c, symbol)
     if err != nil {
+        logger.Log.Errorf(context.Background(), "SetRatio fail when symbol=%s, err: %v", symbol, err)
         return
     }
     newCoinConfig := CoinConfig{}
@@ -203,6 +212,7 @@ func (c *Config) SetRecordPrice(symbol string, price float64) {
     c.ReadFromFile()
     item, err := reflections.GetField(c, symbol)
     if err != nil {
+        logger.Log.Errorf(context.Background(), "SetRecordPrice fail when symbol=%s, err: %v", symbol, err)
         return
     }
     newCoinConfig := CoinConfig{}
@@ -219,6 +229,7 @@ func (c *Config) RemoveRecordPrice(symbol string) {
     c.ReadFromFile()
     item, err := reflections.GetField(c, symbol)
     if err != nil {
+        logger.Log.Errorf(context.Background(), "RemoveRecordPrice fail when symbol=%s, err: %v", symbol, err)
         return
     }
     newCoinConfig := CoinConfig{}
