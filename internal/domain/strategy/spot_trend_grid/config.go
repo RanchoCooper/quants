@@ -3,10 +3,12 @@ package spot_trend_grid
 import (
     "context"
     "encoding/json"
+    "fmt"
     "io/ioutil"
     "os"
 
     "github.com/oleiade/reflections"
+    "github.com/spf13/cast"
 
     "quants/internal/adapter/dependency/http"
     "quants/util/logger"
@@ -66,39 +68,39 @@ func (c *Config) GetCoinList() []string {
 
 func (c *Config) GetBuyPrice(symbol string) float64 {
     c.ReadFromFile()
-    value, err := reflections.GetField(c, symbol)
+    item, err := reflections.GetField(c, symbol)
     if err != nil {
         return 0.0
     }
-    return value.(CoinConfig).RunBet.NextBuyPrice
+    return item.(CoinConfig).RunBet.NextBuyPrice
 }
 
 func (c *Config) GetSellPrice(symbol string) float64 {
     c.ReadFromFile()
-    value, err := reflections.GetField(c, symbol)
+    item, err := reflections.GetField(c, symbol)
     if err != nil {
         return 0.0
     }
-    return value.(CoinConfig).RunBet.GridSellPrice
+    return item.(CoinConfig).RunBet.GridSellPrice
 }
 
 func (c *Config) GetCoinType(symbol string) string {
     c.ReadFromFile()
-    value, err := reflections.GetField(c, symbol)
+    item, err := reflections.GetField(c, symbol)
     if err != nil {
         return ""
     }
-    return value.(CoinConfig).Config.Cointype
+    return item.(CoinConfig).Config.Cointype
 }
 
 func (c *Config) GetRecordPrice(symbol string) float64 {
     c.ReadFromFile()
     step := c.GetStep(symbol) - 1
-    value, err := reflections.GetField(c, symbol)
+    item, err := reflections.GetField(c, symbol)
     if err != nil {
         return 0.0
     }
-    return value.(CoinConfig).RunBet.RecordedPrice[step]
+    return item.(CoinConfig).RunBet.RecordedPrice[step]
 }
 
 // GetQuantity true 为买入，false为卖出
@@ -111,11 +113,11 @@ func (c *Config) GetQuantity(symbol string, exchangeMethod bool) float64 {
     quantity := 0.0
     var quantities []float64
 
-    value, err := reflections.GetField(c, symbol)
+    item, err := reflections.GetField(c, symbol)
     if err != nil {
         return 0.0
     }
-    quantities = value.(CoinConfig).Config.Quantity
+    quantities = item.(CoinConfig).Config.Quantity
 
     if step < len(quantities) {
         if step == 0 {
@@ -132,31 +134,31 @@ func (c *Config) GetQuantity(symbol string, exchangeMethod bool) float64 {
 
 func (c *Config) GetStep(symbol string) int {
     c.ReadFromFile()
-    value, err := reflections.GetField(c, symbol)
+    item, err := reflections.GetField(c, symbol)
     if err != nil {
         return 0
     }
-    return value.(CoinConfig).RunBet.Step
+    return item.(CoinConfig).RunBet.Step
 }
 
 // GetProfitRatio 补仓比率
 func (c *Config) GetProfitRatio(symbol string) float64 {
     c.ReadFromFile()
-    value, err := reflections.GetField(c, symbol)
+    item, err := reflections.GetField(c, symbol)
     if err != nil {
         return 0.0
     }
-    return value.(CoinConfig).Config.ProfitRatio
+    return item.(CoinConfig).Config.ProfitRatio
 }
 
 // GetDoubleThrowRatio 止盈比率
 func (c *Config) GetDoubleThrowRatio(symbol string) float64 {
     c.ReadFromFile()
-    value, err := reflections.GetField(c, symbol)
+    item, err := reflections.GetField(c, symbol)
     if err != nil {
         return 0.0
     }
-    return value.(CoinConfig).Config.DoubleThrowRatio
+    return item.(CoinConfig).Config.DoubleThrowRatio
 }
 
 func (c *Config) GetAtr(symbol string) float64 {
@@ -168,24 +170,24 @@ func (c *Config) GetAtr(symbol string) float64 {
         percentTotal += (kline.High - kline.Low) / kline.Close
     }
 
-    return percentTotal / float64(limit) * 100
+    return cast.ToFloat64(fmt.Sprintf("%.2f", percentTotal/float64(limit)*100))
 }
 
 // SetRatio 修改补仓止盈比率
 func (c *Config) SetRatio(symbol string) {
     c.ReadFromFile()
     atr := c.GetAtr(symbol)
-    switch symbol {
-    case "ETHUSDT":
-        c.ETHUSDT.Config.ProfitRatio = atr
-        c.ETHUSDT.Config.DoubleThrowRatio = atr
-    case "BTCUSDT":
-        c.BTCUSDT.Config.ProfitRatio = atr
-        c.BTCUSDT.Config.DoubleThrowRatio = atr
-    case "BNBUSDT":
-        c.BNBUSDT.Config.ProfitRatio = atr
-        c.BNBUSDT.Config.DoubleThrowRatio = atr
-    default:
+    item, err := reflections.GetField(c, symbol)
+    if err != nil {
+        return
+    }
+    newCoinConfig := CoinConfig{}
+    newCoinConfig = item.(CoinConfig)
+    newCoinConfig.Config.ProfitRatio = atr
+    newCoinConfig.Config.DoubleThrowRatio = atr
+    err = reflections.SetField(c, symbol, newCoinConfig)
+    if err != nil {
+        logger.Log.Errorf(context.Background(), "SetRatio fail, err: %v", err)
     }
 
     c.ModifyJSONData()
@@ -199,32 +201,39 @@ func (c *Config) ModifyJSONData() {
 // SetRecordPrice 记录交易价格
 func (c *Config) SetRecordPrice(symbol string, price float64) {
     c.ReadFromFile()
-    switch symbol {
-    case "ETHUSDT":
-        c.ETHUSDT.RunBet.RecordedPrice = append(c.ETHUSDT.RunBet.RecordedPrice, price)
-    case "BTCUSDT":
-        c.BTCUSDT.RunBet.RecordedPrice = append(c.BTCUSDT.RunBet.RecordedPrice, price)
-    case "BNBUSDT":
-        c.BNBUSDT.RunBet.RecordedPrice = append(c.BNBUSDT.RunBet.RecordedPrice, price)
-    default:
+    item, err := reflections.GetField(c, symbol)
+    if err != nil {
+        return
     }
+    newCoinConfig := CoinConfig{}
+    newCoinConfig = item.(CoinConfig)
+    newCoinConfig.RunBet.RecordedPrice = append(newCoinConfig.RunBet.RecordedPrice, price)
+    err = reflections.SetField(c, symbol, newCoinConfig)
+    if err != nil {
+        logger.Log.Errorf(context.Background(), "SetRecordPrice fail, err: %v", err)
+    }
+    c.ModifyJSONData()
 }
 
 func (c *Config) RemoveRecordPrice(symbol string) {
     c.ReadFromFile()
-    var recordedPrice []float64
-    switch symbol {
-    case "ETHUSDT":
-        recordedPrice = c.ETHUSDT.RunBet.RecordedPrice
-    case "BTCUSDT":
-        recordedPrice = c.BTCUSDT.RunBet.RecordedPrice
-    case "BNBUSDT":
-        recordedPrice = c.BNBUSDT.RunBet.RecordedPrice
-    default:
-        recordedPrice = []float64{0.0}
+    item, err := reflections.GetField(c, symbol)
+    if err != nil {
+        return
     }
-    size := len(recordedPrice)
-    recordedPrice = recordedPrice[:size-1]
+    newCoinConfig := CoinConfig{}
+    newCoinConfig = item.(CoinConfig)
+    size := len(newCoinConfig.RunBet.RecordedPrice)
+    if size == 0 {
+        logger.Log.Errorf(context.Background(), "RemoveRecordPrice fail, current %s RecordedPrice size is 0", symbol)
+        return
+    }
+    newCoinConfig.RunBet.RecordedPrice = newCoinConfig.RunBet.RecordedPrice[:size-1]
+    err = reflections.SetField(c, symbol, newCoinConfig)
+    if err != nil {
+        logger.Log.Errorf(context.Background(), "RemoveRecordPrice fail, err: %v", err)
+        return
+    }
     c.ModifyJSONData()
 }
 
