@@ -20,7 +20,8 @@ import (
 func SpotTrendGridLoop(ctx context.Context, isSimulate bool) {
     c := &spot_trend_grid.Config{}
     for {
-        for _, coinType := range c.GetCoinList() {
+        coinList := c.GetCoinList()
+        for _, coinType := range coinList {
             // 当前网格买入价格
             gridBuyPrice := c.GetBuyPrice(coinType)
             // 当前网格卖出价格

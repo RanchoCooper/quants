@@ -273,5 +273,6 @@ fabric.properties
 
 # End of https://www.toptal.com/developers/gitignore/api/intellij,go
 
-config/config.private.yaml
 tmp/
+config/config.private.yaml
+internal/domain/strategy/spot_trend_grid/data.json
