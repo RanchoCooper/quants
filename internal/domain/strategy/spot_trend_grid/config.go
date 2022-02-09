@@ -11,6 +11,7 @@ import (
     "github.com/spf13/cast"
 
     "quants/internal/adapter/dependency/http"
+    "quants/util"
     "quants/util/logger"
 )
 
@@ -19,7 +20,7 @@ import (
  * @date 2022/2/7
  */
 
-const ConfigFileName = "data.json"
+const ConfigFileName = "/data.json"
 
 type Config struct {
     CoinList []string   `json:"coinList"`
@@ -44,7 +45,7 @@ type CoinConfig struct {
 }
 
 func (c *Config) ReadFromFile() error {
-    jsonFile, err := os.Open(ConfigFileName)
+    jsonFile, err := os.Open(util.GetCurrentPath() + ConfigFileName)
     if err != nil {
         logger.Log.Errorf(context.Background(), "open config file fail, err: %v", err)
         return err
@@ -204,7 +205,10 @@ func (c *Config) SetRatio(symbol string) {
 
 func (c *Config) ModifyJSONData() {
     file, _ := json.MarshalIndent(c, "", "   ")
-    _ = ioutil.WriteFile(ConfigFileName, file, 0644)
+    err := ioutil.WriteFile(util.GetCurrentPath()+ConfigFileName, file, 0644)
+    if err != nil {
+        logger.Log.Errorf(context.Background(), "ModifyJSONData fail, err: %v", err)
+    }
 }
 
 // SetRecordPrice 记录交易价格
@@ -273,5 +277,5 @@ func (c *Config) ModifyPrice(symbol string, dealPrice float64, step int, marketP
     }
 
     c.ModifyJSONData()
-    logger.Log.Infof(context.Background(), "修改后的补仓价格为: %f，修改后的网格价格为: %f", c.ETHUSDT.RunBet.NextBuyPrice, c.ETHUSDT.RunBet.GridSellPrice)
+    logger.Log.Infof(context.Background(), "币种: %s, 修改后的买入价为: %f，修改后的卖出价为: %f", symbol, newCoinConfig.RunBet.NextBuyPrice, newCoinConfig.RunBet.GridSellPrice)
 }

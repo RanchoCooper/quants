@@ -6,7 +6,10 @@ import (
     "time"
 
     "quants/internal/adapter/dependency/http"
+    "quants/internal/domain/entity"
+    "quants/internal/domain/service"
     "quants/internal/domain/strategy/spot_trend_grid"
+    "quants/util/logger"
 )
 
 /**
@@ -17,7 +20,8 @@ import (
 func SpotTrendGridLoop(ctx context.Context, isSimulate bool) {
     c := &spot_trend_grid.Config{}
     for {
-        for _, coinType := range c.GetCoinList() {
+        coinList := c.GetCoinList()
+        for _, coinType := range coinList {
             // 当前网格买入价格
             gridBuyPrice := c.GetBuyPrice(coinType)
             // 当前网格卖出价格
@@ -33,7 +37,7 @@ func SpotTrendGridLoop(ctx context.Context, isSimulate bool) {
                 // 满足买入价
 
                 if !isSimulate {
-                    result := http.BinanceClinet.TradeLimit(ctx, coinType, "BUY", &quantity, &gridBuyPrice)
+                    result := http.BinanceClinet.TradeLimit(ctx, coinType, entity.TradeSideBuy, &quantity, &gridBuyPrice)
                     if result.OrderId != 0 {
                         // 下单成功
                         http.DingDingClient.SendDingDingMessage(fmt.Sprintf("买入成功。币种: %s, 数量: %f, 价格: %f", coinType, quantity, gridBuyPrice), false)
@@ -47,7 +51,14 @@ func SpotTrendGridLoop(ctx context.Context, isSimulate bool) {
                         break
                     }
                 } else {
-                    // handle simulate
+                    // 模拟买入
+                    service.SimulatorSvc.Buy(ctx, coinType, gridBuyPrice, quantity)
+                    http.DingDingClient.SendDingDingMessage(fmt.Sprintf("买入成功。币种: %s, 数量: %f, 价格: %f", coinType, quantity, gridBuyPrice), false)
+                    c.SetRatio(coinType)
+                    c.SetRecordPrice(coinType, gridBuyPrice)
+                    c.ModifyPrice(coinType, marketPrice, step+1, marketPrice)
+                    // 停止运行1min
+                    time.Sleep(time.Minute)
                 }
 
             } else if gridSellPrice < marketPrice {
@@ -62,7 +73,7 @@ func SpotTrendGridLoop(ctx context.Context, isSimulate bool) {
                     profitUSDT := (marketPrice - lastPrice) * sellAmount // 预计盈利
 
                     if !isSimulate {
-                        result := http.BinanceClinet.TradeLimit(ctx, coinType, "SELL", &quantity, &gridBuyPrice)
+                        result := http.BinanceClinet.TradeLimit(ctx, coinType, entity.TradeSideSell, &quantity, &gridBuyPrice)
                         if result.OrderId != 0 {
                             // 下单成功
                             http.DingDingClient.SendDingDingMessage(fmt.Sprintf("卖出成功。币种: %s, 数量: %f, 价格: %f, 预计盈利: %f", coinType, quantity, gridBuyPrice, profitUSDT), false)
@@ -76,9 +87,20 @@ func SpotTrendGridLoop(ctx context.Context, isSimulate bool) {
                             break
                         }
                     } else {
-                        // handle simulate
+                        // 模拟卖出
+                        service.SimulatorSvc.Sell(ctx, coinType, gridSellPrice, quantity)
+                        http.DingDingClient.SendDingDingMessage(fmt.Sprintf("卖出成功。币种: %s, 数量: %f, 价格: %f, 预计盈利: %f", coinType, quantity, gridBuyPrice, profitUSDT), false)
+                        c.SetRatio(coinType)
+                        c.ModifyPrice(coinType, marketPrice, step-1, marketPrice)
+                        c.RemoveRecordPrice(coinType)
+
+                        // 停止运行1min
+                        time.Sleep(time.Minute)
                     }
                 }
+            } else {
+                logger.Log.Infof(ctx, "未满足交易。币种: %s, 当前市价: %f, 买入价: %f, 卖出价: %f, 等待下次运行", coinType, marketPrice, gridBuyPrice, gridSellPrice)
+                time.Sleep(time.Minute)
             }
 
         }

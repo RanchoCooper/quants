@@ -1,10 +1,10 @@
 package application
 
 import (
-    "context"
     "testing"
 
     "quants/config"
+    "quants/internal/domain/service"
 )
 
 /**
@@ -13,13 +13,14 @@ import (
  */
 
 func TestSpotTrendGridLoop(t *testing.T) {
+    service.Init(ctx)
     if config.Config.Env == "local" {
         t.Run("simulate", func(t *testing.T) {
-            SpotTrendGridLoop(context.Background(), true)
+            SpotTrendGridLoop(ctx, true)
         })
 
         t.Run("real", func(t *testing.T) {
-            SpotTrendGridLoop(context.Background(), false)
+            SpotTrendGridLoop(ctx, false)
         })
     }
 }

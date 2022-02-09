@@ -110,5 +110,8 @@ func (e *User) FindByEmail(ctx context.Context, email string) (*entity.User, err
         return nil, errors.New("FindByEmail fail. need name")
     }
     err := e.GetDB(ctx).Model(record).Where("user_email = ?", email).Last(record).Error
+    if errors.Is(err, gorm.ErrRecordNotFound) {
+        return nil, nil
+    }
     return record, err
 }

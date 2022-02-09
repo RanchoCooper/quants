@@ -5,6 +5,8 @@ import (
     "testing"
 
     "github.com/stretchr/testify/assert"
+
+    "quants/config"
 )
 
 /**
@@ -13,25 +15,30 @@ import (
  */
 
 func TestConfig_ReadFromFile(t *testing.T) {
-    c := &Config{}
-    err := c.ReadFromFile()
-    fmt.Println(c)
-    assert.NoError(t, err)
-    assert.NotEmpty(t, c)
+    if config.Config.Env == "local" {
+        c := &Config{}
+        err := c.ReadFromFile()
+        fmt.Println(c)
+        assert.NoError(t, err)
+        assert.NotEmpty(t, c)
+    }
 }
 
 func TestConfig_GetBuyPrice(t *testing.T) {
-    t.Run("basic", func(t *testing.T) {
-        c := &Config{}
-        price := c.GetBuyPrice("BNBUSDT")
-        assert.NotEmpty(t, price)
-    })
+    if config.Config.Env == "local" {
+        t.Run("basic", func(t *testing.T) {
+            c := &Config{}
+            price := c.GetBuyPrice("BNBUSDT")
+            assert.NotEmpty(t, price)
+        })
 
-    t.Run("not exists", func(t *testing.T) {
-        c := &Config{}
-        price := c.GetBuyPrice("not exists")
-        assert.Empty(t, price)
-    })
+        t.Run("not exists", func(t *testing.T) {
+            c := &Config{}
+            price := c.GetBuyPrice("not exists")
+            assert.Empty(t, price)
+        })
+    }
+
 }
 
 func TestConfig_SetRatio(t *testing.T) {

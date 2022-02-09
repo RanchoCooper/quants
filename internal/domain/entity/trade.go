@@ -3,6 +3,7 @@ package entity
 import (
     "time"
 
+    "github.com/shopspring/decimal"
     "gorm.io/gorm"
 )
 
@@ -14,9 +15,13 @@ import (
 type Type int8
 
 const (
-    TypeInit Type = iota
-    TypeBuy
-    TypeSell
+    TradeTypeBuy Type = iota + 1
+    TradeTypeSell
+)
+
+const (
+    TradeSideBuy  = "BUY"
+    TradeSideSell = "SELL"
 )
 
 type Trade struct {
@@ -25,8 +30,8 @@ type Trade struct {
     Symbol     string                 `json:"symbol" structs:",omitempty,underline"`
     OrderId    string                 `json:"order_id" structs:",omitempty,underline"`
     Type       Type                   `json:"type" structs:",omitempty,underline"`
-    Price      float64                `json:"price" structs:",omitempty,underline"`
-    Quantity   float64                `json:"quantity" structs:",omitempty,underline"`
+    Price      decimal.Decimal        `json:"price" structs:",omitempty,underline" gorm:"type:numeric(32,6)"`
+    Quantity   decimal.Decimal        `json:"quantity" structs:",omitempty,underline" gorm:"type:numeric(32,6)"`
     IsSimulate bool                   `json:"is_simulate" structs:",omitempty,underline"`
     CreatedAt  time.Time              `json:"created_at" structs:",omitempty,underline"`
     UpdatedAt  time.Time              `json:"updated_at" structs:",omitempty,underline"`

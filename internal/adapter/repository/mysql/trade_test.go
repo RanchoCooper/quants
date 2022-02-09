@@ -6,6 +6,7 @@ import (
 
     "github.com/DATA-DOG/go-sqlmock"
     "github.com/RanchoCooper/structs"
+    "github.com/shopspring/decimal"
     "github.com/stretchr/testify/assert"
 
     "quants/internal/domain/entity"
@@ -28,8 +29,8 @@ func TestTrade_Create(t *testing.T) {
         Symbol:     "BTC",
         OrderId:    "order-id",
         Type:       1,
-        Price:      1.0,
-        Quantity:   10,
+        Price:      decimal.NewFromFloat(1),
+        Quantity:   decimal.NewFromFloat(10),
         IsSimulate: true,
     }
     trade, err := tradeRepo.Create(ctx, nil, e)
