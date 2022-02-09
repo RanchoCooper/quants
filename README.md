@@ -50,7 +50,7 @@ dingding:
 
 ## TODO List
 
--[x] 支持模拟买入卖出，统计盈利情况
+- [x] 支持模拟买入卖出，统计盈利情况
 
 ## Reference
 [Binance API Doc](https://github.com/binance/binance-spot-api-docs/blob/master/rest-api.md)
