@@ -52,7 +52,10 @@ func SpotTrendGridLoop(ctx context.Context, isSimulate bool) {
                 } else {
                     // 模拟买入
                     service.SimulatorSvc.Buy(ctx, coinType, gridBuyPrice, quantity)
-
+                    http.DingDingClient.SendDingDingMessage(fmt.Sprintf("买入成功。币种: %s, 数量: %f, 价格: %f", coinType, quantity, gridBuyPrice), false)
+                    c.SetRatio(coinType)
+                    c.SetRecordPrice(coinType, gridBuyPrice)
+                    c.ModifyPrice(coinType, marketPrice, step+1, marketPrice)
                     // 停止运行1min
                     time.Sleep(time.Minute)
                 }
@@ -85,6 +88,10 @@ func SpotTrendGridLoop(ctx context.Context, isSimulate bool) {
                     } else {
                         // 模拟卖出
                         service.SimulatorSvc.Sell(ctx, coinType, gridSellPrice, quantity)
+                        http.DingDingClient.SendDingDingMessage(fmt.Sprintf("卖出成功。币种: %s, 数量: %f, 价格: %f, 预计盈利: %f", coinType, quantity, gridBuyPrice, profitUSDT), false)
+                        c.SetRatio(coinType)
+                        c.ModifyPrice(coinType, marketPrice, step-1, marketPrice)
+                        c.RemoveRecordPrice(coinType)
 
                         // 停止运行1min
                         time.Sleep(time.Minute)

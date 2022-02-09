@@ -3,9 +3,12 @@ package service
 import (
     "context"
 
+    "github.com/shopspring/decimal"
+
     "quants/internal/adapter/repository"
     "quants/internal/domain/entity"
     "quants/internal/domain/repo"
+    "quants/util"
     "quants/util/logger"
 )
 
@@ -40,8 +43,8 @@ func (ss *SimulatorService) FindOrCreateSimulateUser(ctx context.Context) *entit
         user, err = ss.UserRepository.Create(ctx, nil, &entity.User{
             UserName:  SimulatorUserName,
             UserEmail: SimulatorUserEmail,
-            Asset:     10000,
-            Profit:    0,
+            Asset:     decimal.NewFromFloat(10000),
+            Profit:    decimal.NewFromFloat(0),
             State:     entity.UserStateEnable,
         })
         if err != nil {
@@ -59,11 +62,12 @@ func (ss *SimulatorService) Buy(ctx context.Context, symbol string, price, quant
     }
 
     trade := &entity.Trade{
+        OrderId:    util.RandString(20, false),
         UserEmail:  user.UserEmail,
         Symbol:     symbol,
         Type:       entity.TradeTypeBuy,
-        Price:      price,
-        Quantity:   quantity,
+        Price:      decimal.NewFromFloat(price),
+        Quantity:   decimal.NewFromFloat(quantity),
         IsSimulate: true,
     }
     trade, err := ss.TradeRepository.Create(ctx, nil, trade)
@@ -73,7 +77,7 @@ func (ss *SimulatorService) Buy(ctx context.Context, symbol string, price, quant
     }
 
     // update user asset
-    user.Asset -= price * quantity
+    user.Asset = user.Asset.Sub(decimal.NewFromFloat(price * quantity))
     err = ss.UserRepository.Update(ctx, nil, user)
     if err != nil {
         logger.Log.Errorf(ctx, "update user fail when simulate, err: %v", err)
@@ -88,11 +92,12 @@ func (ss *SimulatorService) Sell(ctx context.Context, symbol string, price, quan
     }
 
     trade := &entity.Trade{
+        OrderId:    util.RandString(20, false),
         UserEmail:  user.UserEmail,
         Symbol:     symbol,
         Type:       entity.TradeTypeSell,
-        Price:      price,
-        Quantity:   quantity,
+        Price:      decimal.NewFromFloat(price),
+        Quantity:   decimal.NewFromFloat(quantity),
         IsSimulate: true,
     }
     trade, err := ss.TradeRepository.Create(ctx, nil, trade)
@@ -102,7 +107,7 @@ func (ss *SimulatorService) Sell(ctx context.Context, symbol string, price, quan
     }
 
     // update user asset
-    user.Asset += price * quantity
+    user.Asset = user.Asset.Add(decimal.NewFromFloat(price * quantity))
     err = ss.UserRepository.Update(ctx, nil, user)
     if err != nil {
         logger.Log.Errorf(ctx, "update user fail when simulate, err: %v", err)
