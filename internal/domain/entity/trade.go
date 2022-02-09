@@ -14,9 +14,13 @@ import (
 type Type int8
 
 const (
-    TypeInit Type = iota
-    TypeBuy
-    TypeSell
+    TradeTypeBuy Type = iota + 1
+    TradeTypeSell
+)
+
+const (
+    TradeSideBuy  = "BUY"
+    TradeSideSell = "SELL"
 )
 
 type Trade struct {

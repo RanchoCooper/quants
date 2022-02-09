@@ -11,6 +11,7 @@ import (
     "github.com/spf13/cast"
 
     "quants/internal/adapter/dependency/http"
+    "quants/util"
     "quants/util/logger"
 )
 
@@ -19,7 +20,7 @@ import (
  * @date 2022/2/7
  */
 
-const ConfigFileName = "data.json"
+const ConfigFileName = "/data.json"
 
 type Config struct {
     CoinList []string   `json:"coinList"`
@@ -44,7 +45,7 @@ type CoinConfig struct {
 }
 
 func (c *Config) ReadFromFile() error {
-    jsonFile, err := os.Open(ConfigFileName)
+    jsonFile, err := os.Open(util.GetCurrentPath() + ConfigFileName)
     if err != nil {
         logger.Log.Errorf(context.Background(), "open config file fail, err: %v", err)
         return err
