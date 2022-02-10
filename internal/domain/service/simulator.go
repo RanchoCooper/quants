@@ -55,10 +55,14 @@ func (ss *SimulatorService) FindOrCreateSimulateUser(ctx context.Context) *entit
     return user
 }
 
-func (ss *SimulatorService) Buy(ctx context.Context, symbol string, price, quantity float64) {
+func (ss *SimulatorService) Backtest() bool {
+    return true
+}
+
+func (ss *SimulatorService) Buy(ctx context.Context, symbol string, price, quantity float64) bool {
     user := ss.FindOrCreateSimulateUser(ctx)
     if user == nil {
-        return
+        return false
     }
 
     trade := &entity.Trade{
@@ -73,7 +77,7 @@ func (ss *SimulatorService) Buy(ctx context.Context, symbol string, price, quant
     trade, err := ss.TradeRepository.Create(ctx, nil, trade)
     if err != nil {
         logger.Log.Errorf(ctx, "create user trade fail when simulate, trade: %v, err: %v", trade, err)
-        return
+        return false
     }
 
     // update user asset
@@ -81,14 +85,15 @@ func (ss *SimulatorService) Buy(ctx context.Context, symbol string, price, quant
     err = ss.UserRepository.Update(ctx, nil, user)
     if err != nil {
         logger.Log.Errorf(ctx, "update user fail when simulate, err: %v", err)
-        return
+        return false
     }
+    return true
 }
 
-func (ss *SimulatorService) Sell(ctx context.Context, symbol string, price, quantity float64) {
+func (ss *SimulatorService) Sell(ctx context.Context, symbol string, price, quantity float64) bool {
     user := ss.FindOrCreateSimulateUser(ctx)
     if user == nil {
-        return
+        return false
     }
 
     trade := &entity.Trade{
@@ -103,7 +108,7 @@ func (ss *SimulatorService) Sell(ctx context.Context, symbol string, price, quan
     trade, err := ss.TradeRepository.Create(ctx, nil, trade)
     if err != nil {
         logger.Log.Errorf(ctx, "create user trade fail when simulate, trade: %v, err: %v", trade, err)
-        return
+        return false
     }
 
     // update user asset
@@ -111,6 +116,7 @@ func (ss *SimulatorService) Sell(ctx context.Context, symbol string, price, quan
     err = ss.UserRepository.Update(ctx, nil, user)
     if err != nil {
         logger.Log.Errorf(ctx, "update user fail when simulate, err: %v", err)
-        return
+        return false
     }
+    return true
 }

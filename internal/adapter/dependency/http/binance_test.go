@@ -34,7 +34,7 @@ func TestGetTicker24Hour(t *testing.T) {
 }
 
 func TestGetTickerKLine(t *testing.T) {
-    result := BinanceClinet.GetTickerKLine(ctx, "ETHBTC", "1M", 20, 0, 0)
+    result := BinanceClinet.GetTickerKLine(ctx, "ETHBTC", "1M", 20, 1609488000, 1641024000)
     fmt.Println(result)
     assert.NotEmpty(t, result)
 }
@@ -43,7 +43,6 @@ func TestTradeLimit(t *testing.T) {
     quantity := 1.0
     price := 0.00000001
     result := BinanceClinet.TradeLimit(ctx, "ETHBTC", "BUY", &quantity, &price)
-    // FIXME
     // {"code":-1021,"msg":"Timestamp for this request is outside of the recvWindow."}
     fmt.Println(result)
     // assert.NotEmpty(t, result)

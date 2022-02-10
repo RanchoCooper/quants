@@ -41,7 +41,6 @@ func (c *client) Close(ctx context.Context) {
 }
 
 func (c *client) MockClient() redismock.ClusterClientMock {
-    // FIXME unverified
     _, mock := redismock.NewClusterMock()
     return mock
 }

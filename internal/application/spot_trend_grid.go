@@ -6,8 +6,7 @@ import (
     "time"
 
     "quants/internal/adapter/dependency/http"
-    "quants/internal/domain/entity"
-    "quants/internal/domain/service"
+    "quants/internal/domain/repo"
     "quants/internal/domain/strategy/spot_trend_grid"
     "quants/util/logger"
 )
@@ -17,7 +16,7 @@ import (
  * @date 2022/2/8
  */
 
-func SpotTrendGridLoop(ctx context.Context, isSimulate bool) {
+func SpotTrendGridLoop(ctx context.Context, trader repo.ITrader) {
     c := &spot_trend_grid.Config{}
     for {
         coinList := c.GetCoinList()
@@ -27,38 +26,39 @@ func SpotTrendGridLoop(ctx context.Context, isSimulate bool) {
             // 当前网格卖出价格
             gridSellPrice := c.GetSellPrice(coinType)
             // 买入量
-            quantity := c.GetQuantity(coinType, true)
+            gridBuyQuantity := c.GetQuantity(coinType, true)
+            // 卖出量
+            gridSellQuantity := c.GetQuantity(coinType, false)
             // 当前步数
             step := c.GetStep(coinType)
+
             // 当前交易市价
-            marketPrice := http.BinanceClinet.GetTickerPrice(ctx, coinType).Price
+            var marketPrice float64
+            if trader.Backtest() {
+                if c.GetStartTime() >= c.GetEndTime() {
+                    logger.Log.Infof(ctx, "请重新配置回测时间")
+                    return
+                }
+                result := http.BinanceClinet.GetTickerKLine(ctx, coinType, c.GetInterval(), 1, c.GetStartTime(), c.GetEndTime())
+                marketPrice = ((*result)[0].High - (*result)[0].Low) / 2
+                c.UpdateStartTime()
+            } else {
+                marketPrice = http.BinanceClinet.GetTickerPrice(ctx, coinType).Price
+            }
 
             if gridBuyPrice >= marketPrice {
                 // 满足买入价
 
-                if !isSimulate {
-                    result := http.BinanceClinet.TradeLimit(ctx, coinType, entity.TradeSideBuy, &quantity, &gridBuyPrice)
-                    if result.OrderId != 0 {
-                        // 下单成功
-                        http.DingDingClient.SendDingDingMessage(fmt.Sprintf("买入成功。币种: %s, 数量: %f, 价格: %f", coinType, quantity, gridBuyPrice), false)
-                        c.SetRatio(coinType)
-                        c.SetRecordPrice(coinType, result.Price)
-                        c.ModifyPrice(coinType, marketPrice, step+1, marketPrice)
-                        // 停止运行1min
-                        time.Sleep(time.Minute)
-                    } else {
-                        http.DingDingClient.SendDingDingMessage(fmt.Sprintf("买入失败。币种: %s, 数量: %f, 价格: %f", coinType, quantity, gridBuyPrice), false)
-                        break
-                    }
-                } else {
-                    // 模拟买入
-                    service.SimulatorSvc.Buy(ctx, coinType, gridBuyPrice, quantity)
-                    http.DingDingClient.SendDingDingMessage(fmt.Sprintf("买入成功。币种: %s, 数量: %f, 价格: %f", coinType, quantity, gridBuyPrice), false)
+                ok := trader.Buy(ctx, coinType, gridBuyPrice, gridBuyQuantity)
+                if ok {
+                    // 买入成功
+                    http.DingDingClient.SendDingDingMessage(fmt.Sprintf("买入成功。币种: %s, 数量: %f, 价格: %f", coinType, gridBuyQuantity, gridBuyPrice), false)
                     c.SetRatio(coinType)
                     c.SetRecordPrice(coinType, gridBuyPrice)
                     c.ModifyPrice(coinType, marketPrice, step+1, marketPrice)
-                    // 停止运行1min
-                    time.Sleep(time.Minute)
+                } else {
+                    // 买入失败
+                    http.DingDingClient.SendDingDingMessage(fmt.Sprintf("买入失败。币种: %s, 数量: %f, 价格: %f", coinType, gridBuyQuantity, gridBuyPrice), false)
                 }
 
             } else if gridSellPrice < marketPrice {
@@ -72,37 +72,26 @@ func SpotTrendGridLoop(ctx context.Context, isSimulate bool) {
                     sellAmount := c.GetQuantity(coinType, false)
                     profitUSDT := (marketPrice - lastPrice) * sellAmount // 预计盈利
 
-                    if !isSimulate {
-                        result := http.BinanceClinet.TradeLimit(ctx, coinType, entity.TradeSideSell, &quantity, &gridBuyPrice)
-                        if result.OrderId != 0 {
-                            // 下单成功
-                            http.DingDingClient.SendDingDingMessage(fmt.Sprintf("卖出成功。币种: %s, 数量: %f, 价格: %f, 预计盈利: %f", coinType, quantity, gridBuyPrice, profitUSDT), false)
-                            c.SetRatio(coinType)
-                            c.ModifyPrice(coinType, marketPrice, step-1, marketPrice)
-                            c.RemoveRecordPrice(coinType)
-                            // 停止运行1min
-                            time.Sleep(time.Minute)
-                        } else {
-                            http.DingDingClient.SendDingDingMessage(fmt.Sprintf("卖出失败。币种: %s, 数量: %f, 价格: %f", coinType, quantity, gridBuyPrice), false)
-                            break
-                        }
-                    } else {
-                        // 模拟卖出
-                        service.SimulatorSvc.Sell(ctx, coinType, gridSellPrice, quantity)
-                        http.DingDingClient.SendDingDingMessage(fmt.Sprintf("卖出成功。币种: %s, 数量: %f, 价格: %f, 预计盈利: %f", coinType, quantity, gridBuyPrice, profitUSDT), false)
+                    ok := trader.Sell(ctx, coinType, gridSellPrice, gridSellQuantity)
+                    if ok {
+                        // 卖出成功
+                        http.DingDingClient.SendDingDingMessage(fmt.Sprintf("卖出成功。币种: %s, 数量: %f, 价格: %f, 预计盈利: %f", coinType, gridSellQuantity, gridSellPrice, profitUSDT), false)
                         c.SetRatio(coinType)
                         c.ModifyPrice(coinType, marketPrice, step-1, marketPrice)
                         c.RemoveRecordPrice(coinType)
-
-                        // 停止运行1min
-                        time.Sleep(time.Minute)
+                    } else {
+                        // 卖出失败
+                        http.DingDingClient.SendDingDingMessage(fmt.Sprintf("卖出失败。币种: %s, 数量: %f, 价格: %f", coinType, gridSellQuantity, gridSellPrice), false)
                     }
                 }
             } else {
                 logger.Log.Infof(ctx, "未满足交易。币种: %s, 当前市价: %f, 买入价: %f, 卖出价: %f, 等待下次运行", coinType, marketPrice, gridBuyPrice, gridSellPrice)
+            }
+            if trader.Backtest() {
+                time.Sleep(time.Second * 2)
+            } else {
                 time.Sleep(time.Minute)
             }
-
         }
     }
 }

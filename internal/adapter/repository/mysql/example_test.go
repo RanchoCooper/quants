@@ -73,7 +73,6 @@ func TestExample_Get(t *testing.T) {
     exampleRepo := NewExample(NewMySQLClient())
     DB, mock := exampleRepo.MockClient()
     exampleRepo.SetDB(DB)
-    // FIXME
     mock.ExpectQuery(regexp.QuoteMeta("SELECT * FROM `example` WHERE `example`.`id` = ? AND `example`.`deleted_at` IS NULL")).WithArgs(1).WillReturnRows(sqlmock.NewRows([]string{"id", "name"}).AddRow(1, "test1"))
     example, err := exampleRepo.Get(ctx, 1)
     assert.NoError(t, err)

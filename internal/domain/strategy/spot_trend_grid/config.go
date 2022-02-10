@@ -6,6 +6,8 @@ import (
     "fmt"
     "io/ioutil"
     "os"
+    "strings"
+    "time"
 
     "github.com/oleiade/reflections"
     "github.com/spf13/cast"
@@ -23,10 +25,13 @@ import (
 const ConfigFileName = "/data.json"
 
 type Config struct {
-    CoinList []string   `json:"coinList"`
-    ETHUSDT  CoinConfig `json:"ETHUSDT"`
-    BTCUSDT  CoinConfig `json:"BTCUSDT"`
-    BNBUSDT  CoinConfig `json:"BNBUSDT"`
+    StartTime string     `json:"start_time"`
+    EndTime   string     `json:"end_time"`
+    Interval  string     `json:"interval"`
+    CoinList  []string   `json:"coinList"`
+    ETHUSDT   CoinConfig `json:"ETHUSDT"`
+    BTCUSDT   CoinConfig `json:"BTCUSDT"`
+    BNBUSDT   CoinConfig `json:"BNBUSDT"`
 }
 
 type CoinConfig struct {
@@ -60,6 +65,40 @@ func (c *Config) ReadFromFile() error {
     }
 
     return nil
+}
+
+func (c *Config) GetStartTime() int64 {
+    c.ReadFromFile()
+    layout := "2006-01-02 15:04"
+    t, err := time.Parse(layout, c.StartTime)
+    if err != nil {
+        logger.Log.Errorf(context.Background(), "GetStartTime fail when startTime=%s, err: %v", c.StartTime, err)
+        return 0
+    }
+    return t.Unix()
+}
+
+func (c *Config) GetEndTime() int64 {
+    c.ReadFromFile()
+    layout := "2006-01-02 15:04"
+    t, _ := time.Parse(layout, c.StartTime)
+    t2 := t.Add(cast.ToDuration(strings.ToLower(c.Interval)))
+    return t2.Unix()
+}
+
+func (c *Config) GetInterval() string {
+    return c.Interval
+}
+
+func (c *Config) UpdateStartTime() {
+    c.ReadFromFile()
+    layout := "2006-01-02 15:04"
+    t, _ := time.Parse(layout, c.StartTime)
+    t2 := t.Add(cast.ToDuration(strings.ToLower(c.Interval)))
+    // t2 := t.Add(cast.ToDuration(strings.ToLower(c.Interval)) * 10)
+    c.StartTime = t2.Format(layout)
+
+    c.ModifyJSONData()
 }
 
 func (c *Config) GetCoinList() []string {
@@ -126,7 +165,9 @@ func (c *Config) GetQuantity(symbol string, exchangeMethod bool) float64 {
     quantities = item.(CoinConfig).Config.Quantity
 
     if step < len(quantities) {
-        if step == 0 {
+        if step < 0 {
+            step = 0
+        } else if step == 0 {
             quantity = quantities[0]
         } else {
             quantity = quantities[step]
@@ -182,6 +223,14 @@ func (c *Config) GetAtr(symbol string) float64 {
     return cast.ToFloat64(fmt.Sprintf("%.2f", percentTotal/float64(limit)*100))
 }
 
+func (c *Config) ModifyJSONData() {
+    file, _ := json.MarshalIndent(c, "", "   ")
+    err := ioutil.WriteFile(util.GetCurrentPath()+ConfigFileName, file, 0644)
+    if err != nil {
+        logger.Log.Errorf(context.Background(), "ModifyJSONData fail, err: %v", err)
+    }
+}
+
 // SetRatio 修改补仓止盈比率
 func (c *Config) SetRatio(symbol string) {
     c.ReadFromFile()
@@ -201,14 +250,6 @@ func (c *Config) SetRatio(symbol string) {
     }
 
     c.ModifyJSONData()
-}
-
-func (c *Config) ModifyJSONData() {
-    file, _ := json.MarshalIndent(c, "", "   ")
-    err := ioutil.WriteFile(util.GetCurrentPath()+ConfigFileName, file, 0644)
-    if err != nil {
-        logger.Log.Errorf(context.Background(), "ModifyJSONData fail, err: %v", err)
-    }
 }
 
 // SetRecordPrice 记录交易价格

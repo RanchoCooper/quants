@@ -58,3 +58,20 @@ func TestConfig_RemoveRecordPrice(t *testing.T) {
     c := &Config{}
     c.RemoveRecordPrice("BNBUSDT")
 }
+
+func TestConfig_GetStartTime(t *testing.T) {
+    t.SkipNow()
+    c := &Config{}
+    fmt.Println(c.GetStartTime())
+}
+
+func TestConfig_GetEndTime(t *testing.T) {
+    t.SkipNow()
+    c := &Config{}
+    fmt.Println(c.GetEndTime())
+}
+
+func TestConfig_UpdateStartTime(t *testing.T) {
+    c := &Config{}
+    c.UpdateStartTime()
+}
