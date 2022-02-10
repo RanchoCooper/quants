@@ -161,7 +161,6 @@ func (b *client) GetTicker24Hour(ctx context.Context, symbol string) *vo.Ticker2
 }
 
 func (b *client) GetTickerKLine(ctx context.Context, symbol string, interval string, limit int, startTime, endTime int64) *[]vo.KLine {
-    // TODO
     client := &http.Client{}
     req, _ := http.NewRequest(http.MethodGet, fmt.Sprintf("%s/klines", BinanceAPIV3Url), nil)
 
@@ -205,7 +204,6 @@ func (b *client) GetTickerKLine(ctx context.Context, symbol string, interval str
 }
 
 func (b *client) TradeLimit(ctx context.Context, symbol, side string, quantity, price *float64) *vo.TradeResult {
-    // TODO
     client := &http.Client{}
     req, _ := http.NewRequest(http.MethodPost, fmt.Sprintf("%s/order", BinanceAPIV3Url), nil)
 
@@ -234,6 +232,8 @@ func (b *client) TradeLimit(ctx context.Context, symbol, side string, quantity, 
         logger.Log.Errorf(ctx, "TradeLimit error when read body err: %v", err)
         return nil
     }
+
+    fmt.Println(string(body))
 
     if resp.StatusCode != http.StatusOK {
         logger.Log.Errorf(ctx, "Ping error with status code: %d, errMsg: %s", resp.StatusCode, string(body))

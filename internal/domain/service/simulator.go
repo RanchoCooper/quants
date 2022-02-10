@@ -55,6 +55,10 @@ func (ss *SimulatorService) FindOrCreateSimulateUser(ctx context.Context) *entit
     return user
 }
 
+func (ss *SimulatorService) Backtest() bool {
+    return true
+}
+
 func (ss *SimulatorService) Buy(ctx context.Context, symbol string, price, quantity float64) bool {
     user := ss.FindOrCreateSimulateUser(ctx)
     if user == nil {

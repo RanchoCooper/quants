@@ -43,7 +43,6 @@ func TestTradeLimit(t *testing.T) {
     quantity := 1.0
     price := 0.00000001
     result := BinanceClinet.TradeLimit(ctx, "ETHBTC", "BUY", &quantity, &price)
-    // FIXME
     // {"code":-1021,"msg":"Timestamp for this request is outside of the recvWindow."}
     fmt.Println(result)
     // assert.NotEmpty(t, result)

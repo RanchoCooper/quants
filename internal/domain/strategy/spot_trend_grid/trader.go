@@ -25,6 +25,10 @@ func NewTrader() *Trader {
     }
 }
 
+func (t *Trader) Backtest() bool {
+    return false
+}
+
 func (t *Trader) Buy(ctx context.Context, symbol string, price, quantity float64) bool {
     result := http.BinanceClinet.TradeLimit(ctx, symbol, entity.TradeSideBuy, &quantity, &price)
     if result.OrderId != 0 {

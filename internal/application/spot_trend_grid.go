@@ -31,8 +31,14 @@ func SpotTrendGridLoop(ctx context.Context, trader repo.ITrader) {
             gridSellQuantity := c.GetQuantity(coinType, false)
             // 当前步数
             step := c.GetStep(coinType)
+
             // 当前交易市价
-            marketPrice := http.BinanceClinet.GetTickerPrice(ctx, coinType).Price
+            var marketPrice float64
+            if trader.Backtest() {
+                marketPrice = http.BinanceClinet.GetTickerKLine(ctx, coinType)
+            } else {
+                marketPrice = http.BinanceClinet.GetTickerPrice(ctx, coinType).Price
+            }
 
             if gridBuyPrice >= marketPrice {
                 // 满足买入价
