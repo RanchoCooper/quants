@@ -35,7 +35,13 @@ func SpotTrendGridLoop(ctx context.Context, trader repo.ITrader) {
             // 当前交易市价
             var marketPrice float64
             if trader.Backtest() {
-                marketPrice = http.BinanceClinet.GetTickerKLine(ctx, coinType)
+                if c.GetStartTime() >= c.GetEndTime() {
+                    logger.Log.Infof(ctx, "请重新配置回测时间")
+                    return
+                }
+                result := http.BinanceClinet.GetTickerKLine(ctx, coinType, c.GetInterval(), 1, c.GetStartTime(), c.GetEndTime())
+                marketPrice = ((*result)[0].High - (*result)[0].Low) / 2
+                c.UpdateStartTime()
             } else {
                 marketPrice = http.BinanceClinet.GetTickerPrice(ctx, coinType).Price
             }
@@ -50,9 +56,6 @@ func SpotTrendGridLoop(ctx context.Context, trader repo.ITrader) {
                     c.SetRatio(coinType)
                     c.SetRecordPrice(coinType, gridBuyPrice)
                     c.ModifyPrice(coinType, marketPrice, step+1, marketPrice)
-                    // // 停止运行1min
-                    // time.Sleep(time.Minute)
-
                 } else {
                     // 买入失败
                     http.DingDingClient.SendDingDingMessage(fmt.Sprintf("买入失败。币种: %s, 数量: %f, 价格: %f", coinType, gridBuyQuantity, gridBuyPrice), false)
@@ -83,6 +86,10 @@ func SpotTrendGridLoop(ctx context.Context, trader repo.ITrader) {
                 }
             } else {
                 logger.Log.Infof(ctx, "未满足交易。币种: %s, 当前市价: %f, 买入价: %f, 卖出价: %f, 等待下次运行", coinType, marketPrice, gridBuyPrice, gridSellPrice)
+            }
+            if trader.Backtest() {
+                time.Sleep(time.Second * 2)
+            } else {
                 time.Sleep(time.Minute)
             }
         }

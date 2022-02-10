@@ -10,7 +10,6 @@ import (
     "io/ioutil"
     "net/http"
     "net/url"
-    "strconv"
     "sync"
     "time"
 
@@ -146,7 +145,7 @@ func (b *client) GetTicker24Hour(ctx context.Context, symbol string) *vo.Ticker2
     }
 
     if resp.StatusCode != http.StatusOK {
-        logger.Log.Errorf(ctx, "Ping error with status code: %d, errMsg: %s", resp.StatusCode, string(body))
+        logger.Log.Errorf(ctx, "GetTicker24Hour error with status code: %d, errMsg: %s", resp.StatusCode, string(body))
         return nil
     }
 
@@ -170,8 +169,8 @@ func (b *client) GetTickerKLine(ctx context.Context, symbol string, interval str
     query.Add("limit", cast.ToString(limit))
 
     if startTime != 0 && endTime != 0 {
-        query.Add("startTime", strconv.FormatInt(startTime, 10))
-        query.Add("startTime", strconv.FormatInt(endTime, 10))
+        query.Add("startTime", cast.ToString(startTime*1000))
+        query.Add("endTime", cast.ToString(endTime*1000))
     }
     req.URL.RawQuery = query.Encode()
 
@@ -188,8 +187,10 @@ func (b *client) GetTickerKLine(ctx context.Context, symbol string, interval str
         return nil
     }
 
+    fmt.Println(string(body))
+
     if resp.StatusCode != http.StatusOK {
-        logger.Log.Errorf(ctx, "Ping error with status code: %d, errMsg: %s", resp.StatusCode, string(body))
+        logger.Log.Errorf(ctx, "GetTickerKLine error with status code: %d, errMsg: %s", resp.StatusCode, string(body))
         return nil
     }
 
@@ -236,7 +237,7 @@ func (b *client) TradeLimit(ctx context.Context, symbol, side string, quantity, 
     fmt.Println(string(body))
 
     if resp.StatusCode != http.StatusOK {
-        logger.Log.Errorf(ctx, "Ping error with status code: %d, errMsg: %s", resp.StatusCode, string(body))
+        logger.Log.Errorf(ctx, "TradeLimit error with status code: %d, errMsg: %s", resp.StatusCode, string(body))
         return nil
     }
 

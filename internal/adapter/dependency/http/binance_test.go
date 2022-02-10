@@ -34,7 +34,7 @@ func TestGetTicker24Hour(t *testing.T) {
 }
 
 func TestGetTickerKLine(t *testing.T) {
-    result := BinanceClinet.GetTickerKLine(ctx, "ETHBTC", "1M", 20, 0, 0)
+    result := BinanceClinet.GetTickerKLine(ctx, "ETHBTC", "1M", 20, 1609488000, 1641024000)
     fmt.Println(result)
     assert.NotEmpty(t, result)
 }

@@ -6,6 +6,8 @@ import (
     "fmt"
     "io/ioutil"
     "os"
+    "strings"
+    "time"
 
     "github.com/oleiade/reflections"
     "github.com/spf13/cast"
@@ -23,10 +25,13 @@ import (
 const ConfigFileName = "/data.json"
 
 type Config struct {
-    CoinList []string   `json:"coinList"`
-    ETHUSDT  CoinConfig `json:"ETHUSDT"`
-    BTCUSDT  CoinConfig `json:"BTCUSDT"`
-    BNBUSDT  CoinConfig `json:"BNBUSDT"`
+    StartTime string     `json:"start_time"`
+    EndTime   string     `json:"end_time"`
+    Interval  string     `json:"interval"`
+    CoinList  []string   `json:"coinList"`
+    ETHUSDT   CoinConfig `json:"ETHUSDT"`
+    BTCUSDT   CoinConfig `json:"BTCUSDT"`
+    BNBUSDT   CoinConfig `json:"BNBUSDT"`
 }
 
 type CoinConfig struct {
@@ -60,6 +65,40 @@ func (c *Config) ReadFromFile() error {
     }
 
     return nil
+}
+
+func (c *Config) GetStartTime() int64 {
+    c.ReadFromFile()
+    layout := "2006-01-02 15:04"
+    t, err := time.Parse(layout, c.StartTime)
+    if err != nil {
+        logger.Log.Errorf(context.Background(), "GetStartTime fail when startTime=%s, err: %v", c.StartTime, err)
+        return 0
+    }
+    return t.Unix()
+}
+
+func (c *Config) GetEndTime() int64 {
+    c.ReadFromFile()
+    layout := "2006-01-02 15:04"
+    t, _ := time.Parse(layout, c.StartTime)
+    t2 := t.Add(cast.ToDuration(strings.ToLower(c.Interval)))
+    return t2.Unix()
+}
+
+func (c *Config) GetInterval() string {
+    return c.Interval
+}
+
+func (c *Config) UpdateStartTime() {
+    c.ReadFromFile()
+    layout := "2006-01-02 15:04"
+    t, _ := time.Parse(layout, c.StartTime)
+    t2 := t.Add(cast.ToDuration(strings.ToLower(c.Interval)))
+    // t2 := t.Add(cast.ToDuration(strings.ToLower(c.Interval)) * 10)
+    c.StartTime = t2.Format(layout)
+
+    c.ModifyJSONData()
 }
 
 func (c *Config) GetCoinList() []string {
