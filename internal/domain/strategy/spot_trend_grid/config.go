@@ -126,7 +126,9 @@ func (c *Config) GetQuantity(symbol string, exchangeMethod bool) float64 {
     quantities = item.(CoinConfig).Config.Quantity
 
     if step < len(quantities) {
-        if step == 0 {
+        if step < 0 {
+            step = 0
+        } else if step == 0 {
             quantity = quantities[0]
         } else {
             quantity = quantities[step]
