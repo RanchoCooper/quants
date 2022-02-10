@@ -66,13 +66,13 @@ func SpotTrendGridLoop(ctx context.Context, trader repo.ITrader) {
                     ok := trader.Sell(ctx, coinType, gridSellPrice, gridSellQuantity)
                     if ok {
                         // 卖出成功
-                        http.DingDingClient.SendDingDingMessage(fmt.Sprintf("卖出成功。币种: %s, 数量: %f, 价格: %f, 预计盈利: %f", coinType, gridSellQuantity, gridBuyPrice, profitUSDT), false)
+                        http.DingDingClient.SendDingDingMessage(fmt.Sprintf("卖出成功。币种: %s, 数量: %f, 价格: %f, 预计盈利: %f", coinType, gridSellQuantity, gridSellPrice, profitUSDT), false)
                         c.SetRatio(coinType)
                         c.ModifyPrice(coinType, marketPrice, step-1, marketPrice)
                         c.RemoveRecordPrice(coinType)
                     } else {
                         // 卖出失败
-                        http.DingDingClient.SendDingDingMessage(fmt.Sprintf("卖出失败。币种: %s, 数量: %f, 价格: %f", coinType, gridSellQuantity, gridBuyPrice), false)
+                        http.DingDingClient.SendDingDingMessage(fmt.Sprintf("卖出失败。币种: %s, 数量: %f, 价格: %f", coinType, gridSellQuantity, gridSellPrice), false)
                     }
                 }
             } else {

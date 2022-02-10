@@ -184,6 +184,14 @@ func (c *Config) GetAtr(symbol string) float64 {
     return cast.ToFloat64(fmt.Sprintf("%.2f", percentTotal/float64(limit)*100))
 }
 
+func (c *Config) ModifyJSONData() {
+    file, _ := json.MarshalIndent(c, "", "   ")
+    err := ioutil.WriteFile(util.GetCurrentPath()+ConfigFileName, file, 0644)
+    if err != nil {
+        logger.Log.Errorf(context.Background(), "ModifyJSONData fail, err: %v", err)
+    }
+}
+
 // SetRatio 修改补仓止盈比率
 func (c *Config) SetRatio(symbol string) {
     c.ReadFromFile()
@@ -203,14 +211,6 @@ func (c *Config) SetRatio(symbol string) {
     }
 
     c.ModifyJSONData()
-}
-
-func (c *Config) ModifyJSONData() {
-    file, _ := json.MarshalIndent(c, "", "   ")
-    err := ioutil.WriteFile(util.GetCurrentPath()+ConfigFileName, file, 0644)
-    if err != nil {
-        logger.Log.Errorf(context.Background(), "ModifyJSONData fail, err: %v", err)
-    }
 }
 
 // SetRecordPrice 记录交易价格
