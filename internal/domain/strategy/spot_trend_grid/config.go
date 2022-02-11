@@ -25,6 +25,7 @@ import (
 const ConfigFileName = "/data.json"
 
 type Config struct {
+    Backtest  bool       `json:"backtest"`
     StartTime string     `json:"start_time"`
     EndTime   string     `json:"end_time"`
     Interval  string     `json:"interval"`

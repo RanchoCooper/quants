@@ -34,7 +34,7 @@ func SpotTrendGridLoop(ctx context.Context, trader repo.ITrader) {
 
             // 当前交易市价
             var marketPrice float64
-            if trader.Backtest() {
+            if c.Backtest {
                 if c.GetStartTime() >= c.GetEndTime() {
                     logger.Log.Infof(ctx, "请重新配置回测时间")
                     return
