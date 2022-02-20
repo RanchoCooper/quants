@@ -87,7 +87,7 @@ func SpotTrendGridLoop(ctx context.Context, trader repo.ITrader) {
             } else {
                 logger.Log.Infof(ctx, "未满足交易。币种: %s, 当前市价: %f, 买入价: %f, 卖出价: %f, 等待下次运行", coinType, marketPrice, gridBuyPrice, gridSellPrice)
             }
-            if trader.Backtest() {
+            if c.Backtest {
                 time.Sleep(time.Second * 2)
             } else {
                 time.Sleep(time.Minute)
