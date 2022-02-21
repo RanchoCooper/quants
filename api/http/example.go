@@ -5,8 +5,8 @@ import (
     "github.com/jinzhu/copier"
     "github.com/spf13/cast"
 
-    "quants/api/http/dto"
-    "quants/api/http/error_code"
+    "quants/api/dto"
+    "quants/api/error_code"
     "quants/api/http/handle"
     "quants/api/http/validator"
     "quants/internal/domain/entity"

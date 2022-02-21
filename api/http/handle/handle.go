@@ -5,8 +5,8 @@ import (
 
     "github.com/gin-gonic/gin"
 
-    "quants/api/http/dto"
-    "quants/api/http/error_code"
+    "quants/api/dto"
+    "quants/api/error_code"
     "quants/api/http/paginate"
 )
 
